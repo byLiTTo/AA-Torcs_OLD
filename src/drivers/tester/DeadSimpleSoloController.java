@@ -1,5 +1,9 @@
-package champ2011client;
+package drivers.tester;
 
+
+import champ2011client.Action;
+import champ2011client.Controller;
+import champ2011client.SensorModel;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,7 +13,7 @@ package champ2011client;
  */
 public class DeadSimpleSoloController extends Controller {
 
-    final double targetSpeed = 15;
+    final double targetSpeed = 55;
 
 
     public Action control(SensorModel sensorModel) {

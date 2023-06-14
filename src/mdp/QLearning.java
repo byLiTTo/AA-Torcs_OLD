@@ -22,9 +22,14 @@ public class QLearning {
     private Random random;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    QLearning(String filePath) {
+    public QLearning(String filePath) {
         this.qTable = new HashMap<>();
         this.possibleActions = Arrays.stream(Actions.values()).toList();
+
+        this.epsilon = SteerControlVariables.INITIAL_VALUE;
+        this.epochs = 0;
+
+        this.random = new Random(System.currentTimeMillis());
 
         File f = new File(filePath);
         if (!f.exists()) this.createQTable();
@@ -67,7 +72,7 @@ public class QLearning {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private void saveTable(String filePath) {
         try (PrintWriter file = new PrintWriter((filePath))) {
-            file.write("");
+            file.write(" Q-TABLE ");
             file.write(SteerControlVariables.SEPARATOR);
             for (Actions action : this.possibleActions) {
                 file.write(action.name());

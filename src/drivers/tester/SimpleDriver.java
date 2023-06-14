@@ -1,4 +1,8 @@
-package champ2011client;
+package drivers.tester;
+
+import champ2011client.Action;
+import champ2011client.Controller;
+import champ2011client.SensorModel;
 
 public class SimpleDriver extends Controller {
 
