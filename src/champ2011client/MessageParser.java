@@ -1,7 +1,7 @@
 package champ2011client;
 
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 /**
@@ -16,9 +16,9 @@ public class MessageParser {
 
     private Hashtable<String, Object> table = new Hashtable<String, Object>();
     private String message;
-    
+
     public MessageParser(String message) {
-    	this.message = message;
+        this.message = message;
         //System.out.println(message);
         StringTokenizer mt = new StringTokenizer(message, "(");
         while (mt.hasMoreElements()) {
@@ -36,35 +36,31 @@ public class MessageParser {
                 String readingName = rt.nextToken();
                 Object readingValue = "";
                 if (readingName.equals("opponents") || readingName.equals("track") ||
-                        readingName.equals("wheelSpinVel")|| readingName.equals("focus") ) {//ML
+                        readingName.equals("wheelSpinVel") || readingName.equals("focus")) {//ML
                     // these readings have multiple values
                     readingValue = new double[rt.countTokens()];
                     int position = 0;
                     //System.out.println(readingName);
                     while (rt.hasMoreElements()) {
-                        String nextToken = rt.nextToken ();
+                        String nextToken = rt.nextToken();
                         //System.out.print (nextToken);
-                        try{
+                        try {
                             ((double[]) readingValue)[position] = Double.parseDouble(nextToken);
-                         }
-                        catch (Exception e)
-                        {
-                            System.out.println("Error parsing value '"+nextToken+"' for "+ readingName+" using 0.0");
-                            System.out.println("Message: "+message);
+                        } catch (Exception e) {
+                            System.out.println("Error parsing value '" + nextToken + "' for " + readingName + " using 0.0");
+                            System.out.println("Message: " + message);
                             ((double[]) readingValue)[position] = 0.0;
                         }
                         //System.out.println(" "   +position +" " + ((double[])readingValue)[position]);
                         position++;
                     }
                 } else {
-                    String token = rt.nextToken ();
-                    try{
-                        readingValue = new Double (token);
-                    }
-                    catch (Exception e)
-                    {
-                        System.out.println("Error parsing value '"+token+"' for "+ readingName+" using 0.0");
-                        System.out.println("Message: "+message);
+                    String token = rt.nextToken();
+                    try {
+                        readingValue = new Double(token);
+                    } catch (Exception e) {
+                        System.out.println("Error parsing value '" + token + "' for " + readingName + " using 0.0");
+                        System.out.println("Message: " + message);
                         readingValue = new Double(0.0);
                     }
                 }
@@ -86,7 +82,7 @@ public class MessageParser {
         return table.get(key);
     }
 
-	public String getMessage() {
-		return message;
-	}
+    public String getMessage() {
+        return message;
+    }
 }

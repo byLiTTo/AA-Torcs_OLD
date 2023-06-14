@@ -10,49 +10,49 @@ public interface SensorModel {
 
     // basic information about your car and the track (you probably should take care of these somehow)
 
-    public double getSpeed ();
+    public double getSpeed();
 
-    public double getAngleToTrackAxis ();
+    public double getAngleToTrackAxis();
 
-    public double[] getTrackEdgeSensors ();
-    
-    public double[] getFocusSensors ();//ML
+    public double[] getTrackEdgeSensors();
+
+    public double[] getFocusSensors();//ML
 
     public double getTrackPosition();
 
-    public int getGear ();
+    public int getGear();
 
     // basic information about other cars (only useful for multi-car races)
 
-    public double[] getOpponentSensors ();
+    public double[] getOpponentSensors();
 
-    public int getRacePosition ();
+    public int getRacePosition();
 
     // additional information (use if you need)
 
-    public double getLateralSpeed ();
-    
+    public double getLateralSpeed();
 
-    public double getCurrentLapTime ();
 
-    public double getDamage ();
+    public double getCurrentLapTime();
 
-    public double getDistanceFromStartLine ();
+    public double getDamage();
 
-    public double getDistanceRaced ();
+    public double getDistanceFromStartLine();
 
-    public double getFuelLevel ();
+    public double getDistanceRaced();
 
-    public double getLastLapTime ();
+    public double getFuelLevel();
 
-    public double getRPM ();
+    public double getLastLapTime();
 
-    public double[] getWheelSpinVelocity ();
-    
-    public double getZSpeed ();
-    
-    public double getZ ();
-    
+    public double getRPM();
+
+    public double[] getWheelSpinVelocity();
+
+    public double getZSpeed();
+
+    public double getZ();
+
     public String getMessage();
-    
+
 }

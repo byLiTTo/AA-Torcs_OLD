@@ -11,11 +11,11 @@ public class MessageBasedSensorModel implements SensorModel {
 
     private MessageParser message;
 
-    public MessageBasedSensorModel (MessageParser message) {
+    public MessageBasedSensorModel(MessageParser message) {
         this.message = message;
     }
-    
-    public MessageBasedSensorModel (String strMessage) {
+
+    public MessageBasedSensorModel(String strMessage) {
         this.message = new MessageParser(strMessage);
     }
 
@@ -32,7 +32,7 @@ public class MessageBasedSensorModel implements SensorModel {
     }
 
     public double[] getFocusSensors() {//ML
-    	return (double[]) message.getReading("focus");//ML
+        return (double[]) message.getReading("focus");//ML
     }//ML
 
     public int getGear() {
@@ -88,16 +88,16 @@ public class MessageBasedSensorModel implements SensorModel {
         return (double[]) message.getReading("wheelSpinVel");
     }
 
-	public String getMessage() {
-		return message.getMessage();
-	}
+    public String getMessage() {
+        return message.getMessage();
+    }
 
-	public double getZ() {
-		return (Double) message.getReading("z"); 
-	}
+    public double getZ() {
+        return (Double) message.getReading("z");
+    }
 
-	public double getZSpeed() {
-		return (Double) message.getReading("speedZ");
-	}
+    public double getZSpeed() {
+        return (Double) message.getReading("speedZ");
+    }
 
 }

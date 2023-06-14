@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Primer commit de creación del proyecto" />
+    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Añadido paquete champ2011client">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/carlo.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Action.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/DeadSimpleSoloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/DeadSimpleSoloController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/MessageBasedSensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/MessageBasedSensorModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/MessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/MessageParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/SensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/SensorModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/SimpleDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/SimpleDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/SocketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/SocketHandler.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -18,8 +43,10 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
@@ -28,7 +55,7 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "settings.editor.selected.configurable": "preferences.sourceCode",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -42,7 +69,7 @@
       <updated>1686737502562</updated>
       <workItem from="1686737503714" duration="69000" />
       <workItem from="1686737591253" duration="39000" />
-      <workItem from="1686737767471" duration="378000" />
+      <workItem from="1686737767471" duration="6137000" />
     </task>
     <task id="LOCAL-00001" summary="Primer commit de creación del proyecto">
       <created>1686738140221</created>
@@ -51,7 +78,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686738140222</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Añadido paquete champ2011client">
+      <created>1686738324481</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1686738324481</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -59,7 +93,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Primer commit de creación del proyecto" />
-    <option name="LAST_COMMIT_MESSAGE" value="Primer commit de creación del proyecto" />
+    <MESSAGE value="Añadido paquete champ2011client" />
+    <option name="LAST_COMMIT_MESSAGE" value="Añadido paquete champ2011client" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
