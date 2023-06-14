@@ -9,7 +9,6 @@ import java.util.StringTokenizer;
 
 /**
  * @author Daniele Loiacono
- *
  */
 public class Client {
 
@@ -24,16 +23,15 @@ public class Client {
     private static String trackName;
 
     /**
-     * @param args
-     *            is used to define all the options of the client.
-     *            <port:N> is used to specify the port for the connection (default is 3001)
-     *            <host:ADDRESS> is used to specify the address of the host where the server is running (default is localhost)
-     *            <id:ClientID> is used to specify the ID of the client sent to the server (default is championship2009)
-     *            <verbose:on> is used to set verbose mode on (default is off)
-     *            <maxEpisodes:N> is used to set the number of episodes (default is 1)
-     *            <maxSteps:N> is used to set the max number of steps for each episode (0 is default value, that means unlimited number of steps)
-     *            <stage:N> is used to set the current stage: 0 is WARMUP, 1 is QUALIFYING, 2 is RACE, others value means UNKNOWN (default is UNKNOWN)
-     *            <trackName:name> is used to set the name of current track
+     * @param args is used to define all the options of the client.
+     *             <port:N> is used to specify the port for the connection (default is 3001)
+     *             <host:ADDRESS> is used to specify the address of the host where the server is running (default is localhost)
+     *             <id:ClientID> is used to specify the ID of the client sent to the server (default is championship2009)
+     *             <verbose:on> is used to set verbose mode on (default is off)
+     *             <maxEpisodes:N> is used to set the number of episodes (default is 1)
+     *             <maxSteps:N> is used to set the max number of steps for each episode (0 is default value, that means unlimited number of steps)
+     *             <stage:N> is used to set the current stage: 0 is WARMUP, 1 is QUALIFYING, 2 is RACE, others value means UNKNOWN (default is UNKNOWN)
+     *             <trackName:name> is used to set the name of current track
      */
     public static void main(String[] args) {
         parseParameters(args);
@@ -195,10 +193,8 @@ public class Client {
             System.out.println(name + " is not a class name");
             System.exit(0);
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return controller;

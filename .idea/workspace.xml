@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Creado paquete QLearning">
-      <change afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" afterDir="false" />
+    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Creado Driver de test que gestiona el control de giro">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/DeadSimpleSoloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/DeadSimpleSoloController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/SimpleDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/SimpleDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/QLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/champ2011client/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/champ2011client/Client.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/champ2011client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,7 +66,7 @@
       <updated>1686737502562</updated>
       <workItem from="1686737503714" duration="69000" />
       <workItem from="1686737591253" duration="39000" />
-      <workItem from="1686737767471" duration="17030000" />
+      <workItem from="1686737767471" duration="21657000" />
     </task>
     <task id="LOCAL-00001" summary="Primer commit de creación del proyecto">
       <created>1686738140221</created>
@@ -90,7 +89,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686749606876</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Creado Driver de test que gestiona el control de giro">
+      <created>1686768014856</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1686768014856</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -100,7 +106,8 @@
     <MESSAGE value="Primer commit de creación del proyecto" />
     <MESSAGE value="Añadido paquete champ2011client" />
     <MESSAGE value="Creado paquete QLearning" />
-    <option name="LAST_COMMIT_MESSAGE" value="Creado paquete QLearning" />
+    <MESSAGE value="Creado Driver de test que gestiona el control de giro" />
+    <option name="LAST_COMMIT_MESSAGE" value="Creado Driver de test que gestiona el control de giro" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
