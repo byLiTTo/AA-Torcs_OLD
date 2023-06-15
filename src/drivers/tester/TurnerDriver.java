@@ -72,7 +72,7 @@ public class TurnerDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public TurnerDriver() {
-        this.steerControlSystem = new QLearning("./steerQTable.csv");
+        this.steerControlSystem = new QLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
         this.lastState = SteerControlVariables.States.STARTING_GRID;
         this.currentState = lastState;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
@@ -160,6 +160,7 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void reset() {
+        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
         System.out.println("Restarting the race!");
 
     }
@@ -171,7 +172,7 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void shutdown() {
-        this.steerControlSystem.result("./steerQTable.csv");
+        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
         System.out.println("Bye bye!");
     }
 

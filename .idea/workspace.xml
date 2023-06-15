@@ -5,11 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Creado Driver de test que gestiona el control de giro">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/924f089edb4af5ee45c8a9d1129cd28e2b368138" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/5/a5cc2925ca8258af241be7e5b0381edf30266302" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/7/d7b8ea38e6d876bcca51f36f63e0dbc0a3b33011" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/champ2011client/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/champ2011client/Client.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/QLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -43,11 +47,12 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/WORKSPACE/AA-Torcs",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "preferences.sourceCode",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>

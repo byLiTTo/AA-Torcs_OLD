@@ -1,12 +1,16 @@
 package mdp;
 
-import mdp.SteerControlVariables.Actions;
-import mdp.SteerControlVariables.States;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import mdp.SteerControlVariables.Actions;
+import mdp.SteerControlVariables.States;
 
 public class QLearning {
 
@@ -24,7 +28,7 @@ public class QLearning {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public QLearning(String filePath) {
         this.qTable = new HashMap<>();
-        this.possibleActions = Arrays.stream(Actions.values()).toList();
+        this.possibleActions = Arrays.asList(Actions.values());
 
         this.epsilon = SteerControlVariables.INITIAL_VALUE;
         this.epochs = 0;
@@ -201,8 +205,8 @@ public class QLearning {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public void result(String filePath) {
-        this.epsilon = (SteerControlVariables.INITIAL_VALUE * SteerControlVariables.TRAIN_EPOCHS)
-                / (SteerControlVariables.TRAIN_EPOCHS + (this.epochs * 4.7));
+        this.epsilon = (SteerControlVariables.INITIAL_VALUE * 250)
+                / (250 + (this.epochs * 4.7));
         this.saveTable(filePath);
     }
 
