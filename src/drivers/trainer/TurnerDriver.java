@@ -8,6 +8,8 @@ import champ2011client.SensorModel;
 import mdp.QLearning;
 import mdp.SteerControlVariables;
 
+import static mdp.SteerControlVariables.*;
+
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -21,32 +23,27 @@ public class TurnerDriver extends Controller {
     /* Gear Changing Constants */
     final int[] gearUp = {5000, 6000, 6000, 6500, 7000, 0};
     final int[] gearDown = {0, 2500, 3000, 3000, 3500, 3500};
-
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Stuck constants */
     final int stuckTime = 25;
     final float stuckAngle = (float) 0.523598775; //PI/6
-
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
     final float maxSpeedDist = 70;
     final float maxSpeed = 150;
     final float sin5 = (float) 0.08716;
     final float cos5 = (float) 0.99619;
-
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Steering constants */
     final float steerLock = (float) 0.785398;
     final float steerSensitivityOffset = (float) 80.0;
     final float wheelSensitivityCoeff = 1;
-
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* ABS Filter Constants */
     final float wheelRadius[] = {(float) 0.3179, (float) 0.3179, (float) 0.3276, (float) 0.3276};
     final float absSlip = (float) 2.0;
     final float absRange = (float) 3.0;
     final float absMinSpeed = (float) 3.0;
-
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Clutching Constants */
     final float clutchMax = (float) 0.5;
@@ -57,14 +54,23 @@ public class TurnerDriver extends Controller {
     final float clutchDec = (float) 0.01;
     final float clutchMaxModifier = (float) 1.3;
     final float clutchMaxTime = (float) 1.5;
+    private final double trackLenght = 2057.56;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private final QLearning steerControlSystem;
     private int stuck = 0;
     // current clutch
     private float clutch = 0;
+    private SensorModel lastSensorModel;
+    private SensorModel currentSensorModel;
     private SteerControlVariables.States lastState;
     private SteerControlVariables.States currentState;
     private SteerControlVariables.Actions actionPerformed;
+    private int maxEpochs = 20;
+    private int rangeEpochs = 15;
+    private int epochs;
+    private int laps;
+    private double lastReward;
+    private double distanceRaced;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -72,10 +78,16 @@ public class TurnerDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public TurnerDriver() {
-        this.steerControlSystem = new QLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.steerControlSystem = new QLearning(STEER_Q_TABLE_PATH, this.rangeEpochs);
         this.lastState = SteerControlVariables.States.STARTING_GRID;
         this.currentState = lastState;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.lastSensorModel = null;
+        this.currentSensorModel = null;
+        this.epochs = 0;
+        this.laps = 0;
+        this.lastReward = 0;
+        this.distanceRaced = 0;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -87,70 +99,108 @@ public class TurnerDriver extends Controller {
      * @return The action to be performed by the car (acceleration, brake, gear, and steering).
      */
     public Action control(SensorModel sensorModel) {
-        // check if car is currently stuck
-        if (Math.abs(sensorModel.getAngleToTrackAxis()) > stuckAngle) {
-            // update stuck counter
-            stuck++;
-        } else {
-            // if not stuck reset stuck counter
-            stuck = 0;
-        }
-
-        // after car is stuck for a while apply recovering policy
-        if (stuck > stuckTime) {
-            /* set gear and sterring command assuming car is
-             * pointing in a direction out of track */
-
-            // to bring car parallel to track axis
-            float steer = (float) (-sensorModel.getAngleToTrackAxis() / steerLock);
-            int gear = -1; // gear R
-
-            // if car is pointing in the correct direction revert gear and steer
-            if (sensorModel.getAngleToTrackAxis() * sensorModel.getTrackPosition() > 0) {
-                gear = 1;
-                steer = -steer;
-            }
-            clutch = clutching(sensorModel, clutch);
-            // build a CarControl variable and return it
-            Action action = new Action();
-            action.gear = gear;
-            action.steering = steer;
-            action.accelerate = 1.0;
-            action.brake = 0;
-            action.clutch = clutch;
-            return action;
-        } else // car is not stuck
-        {
-            // compute accel/brake command
-            float accel_and_brake = getAccel(sensorModel);
-            // compute gear
-            int gear = getGear(sensorModel);
-
-            // set accel and brake from the joint accel/brake command
-            float accel, brake;
-            if (accel_and_brake > 0) {
-                accel = accel_and_brake;
-                brake = 0;
+        System.out.println("EPOCH: " + (this.epochs + 1) + "/" + this.maxEpochs);
+        System.out.println("Complete Laps: " + laps);
+        System.out.println("State: " + this.currentState.name());
+        System.out.println("Action: " + this.actionPerformed.name());
+        System.out.println("Reward: " + this.lastReward);
+        System.out.println();
+        this.distanceRaced = sensorModel.getDistanceRaced();
+        if (this.distanceRaced < (this.trackLenght - 0.1)) {
+            if (Math.abs(sensorModel.getTrackPosition()) >= 1) {
+//                this.steerControlSystem.lastUpdate(this.actionPerformed, -1000.0);
+                Action action = new Action();
+                action.restartRace = true;
+                return action;
             } else {
-                accel = 0;
-                // apply ABS to brake
-                brake = filterABS(sensorModel, -accel_and_brake);
+                // check if car is currently stuck
+                if (Math.abs(sensorModel.getAngleToTrackAxis()) > stuckAngle) {
+                    // update stuck counter
+                    stuck++;
+                } else {
+                    // if not stuck reset stuck counter
+                    stuck = 0;
+                }
+
+                // after car is stuck for a while apply recovering policy
+                if (stuck > stuckTime) {
+                    /* set gear and sterring command assuming car is
+                     * pointing in a direction out of track */
+
+                    // to bring car parallel to track axis
+                    float steer = (float) (-sensorModel.getAngleToTrackAxis() / steerLock);
+                    int gear = -1; // gear R
+
+                    // if car is pointing in the correct direction revert gear and steer
+                    if (sensorModel.getAngleToTrackAxis() * sensorModel.getTrackPosition() > 0) {
+                        gear = 1;
+                        steer = -steer;
+                    }
+                    clutch = clutching(sensorModel, clutch);
+                    // build a CarControl variable and return it
+                    Action action = new Action();
+                    action.gear = gear;
+                    action.steering = steer;
+                    action.accelerate = 1.0;
+                    action.brake = 0;
+                    action.clutch = clutch;
+                    return action;
+                } else // car is not stuck
+                {
+                    // compute accel/brake command
+                    float accel_and_brake = getAccel(sensorModel);
+                    // compute gear
+                    int gear = getGear(sensorModel);
+
+                    // set accel and brake from the joint accel/brake command
+                    float accel, brake;
+                    if (accel_and_brake > 0) {
+                        accel = accel_and_brake;
+                        brake = 0;
+                    } else {
+                        accel = 0;
+                        // apply ABS to brake
+                        brake = filterABS(sensorModel, -accel_and_brake);
+                    }
+
+                    clutch = clutching(sensorModel, clutch);
+
+                    // build a CarControl variable and return it
+                    Action action = new Action();
+                    /* Update variables for steer control system -------------------------------------------------- */
+                    this.lastSensorModel = this.currentSensorModel;
+                    this.currentSensorModel = sensorModel;
+                    this.lastState = this.currentState;
+                    this.currentState = SteerControlVariables.evaluateSteerState(sensorModel);
+                    this.lastReward = SteerControlVariables.calculateReward(this.lastSensorModel, sensorModel);
+                    this.actionPerformed = this.steerControlSystem.Update(
+                            this.lastState,
+                            this.currentState,
+                            this.actionPerformed,
+                            this.lastReward
+                    );
+                    action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.actionPerformed);
+                    /* ------------------------------------------------------------------------------------------- */
+//                    if (sensorModel.getSpeed() < this.maxSpeed) {
+//                        action.accelerate = 1;
+//                    }
+//                    action.gear = 1;
+
+                    action.accelerate = accel;
+                    action.gear = gear;
+                    action.brake = brake;
+                    action.clutch = clutch;
+
+                    return action;
+                }
             }
-
-            clutch = clutching(sensorModel, clutch);
-
-            // build a CarControl variable and return it
+        } else {
+            this.laps++;
             Action action = new Action();
-            action.gear = gear;
-            this.lastState = currentState;
-            this.currentState = SteerControlVariables.evaluateSteerState(sensorModel);
-            this.actionPerformed = this.steerControlSystem.nextOnlyBestAction(currentState);
-            action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.actionPerformed);
-            action.accelerate = accel;
-            action.brake = brake;
-            action.clutch = clutch;
+            action.restartRace = true;
             return action;
         }
+
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -160,7 +210,13 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.lastState = SteerControlVariables.States.STARTING_GRID;
+        this.currentState = lastState;
+        this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.epochs++;
+        this.lastReward = 0;
+        String newResults = this.generateStatistics();
+        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TRAIN_PATH, newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -172,7 +228,9 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void shutdown() {
-        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.epochs++;
+        String newResults = this.generateStatistics();
+        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TRAIN_PATH, newResults);
         System.out.println("Bye bye!");
     }
 
@@ -362,5 +420,15 @@ public class TurnerDriver extends Controller {
             return 0;
         else
             return brake;
+    }
+
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    private String generateStatistics() {
+        return getTrackName() + SEPARATOR
+                + this.maxEpochs + SEPARATOR
+                + this.epochs + SEPARATOR
+                + this.distanceRaced + SEPARATOR
+                + this.laps;
     }
 }

@@ -8,6 +8,9 @@ import champ2011client.SensorModel;
 import mdp.QLearning;
 import mdp.SteerControlVariables;
 
+import static mdp.SteerControlVariables.SEPARATOR;
+import static mdp.SteerControlVariables.STEER_STATISTICS_TEST_PATH;
+
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -57,14 +60,22 @@ public class TurnerDriver extends Controller {
     final float clutchDec = (float) 0.01;
     final float clutchMaxModifier = (float) 1.3;
     final float clutchMaxTime = (float) 1.5;
+    private final double trackLenght = 2057.56;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private final QLearning steerControlSystem;
     private int stuck = 0;
     // current clutch
     private float clutch = 0;
+    private SensorModel lastSensorModel;
+    private SensorModel currentSensorModel;
     private SteerControlVariables.States lastState;
     private SteerControlVariables.States currentState;
     private SteerControlVariables.Actions actionPerformed;
+    private int maxEpochs = 4;
+    private int epochs;
+    private int laps;
+    private double lastReward;
+    private double distanceRaced;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -73,9 +84,12 @@ public class TurnerDriver extends Controller {
      */
     public TurnerDriver() {
         this.steerControlSystem = new QLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
-        this.lastState = SteerControlVariables.States.STARTING_GRID;
-        this.currentState = lastState;
+        this.currentState = SteerControlVariables.States.STARTING_GRID;
+        ;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.epochs = 0;
+        this.laps = 0;
+        this.distanceRaced = 0;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -87,6 +101,13 @@ public class TurnerDriver extends Controller {
      * @return The action to be performed by the car (acceleration, brake, gear, and steering).
      */
     public Action control(SensorModel sensorModel) {
+        System.out.println("EPOCH: " + (this.epochs + 1) + "/" + this.maxEpochs);
+        System.out.println("Complete Laps: " + laps);
+        System.out.println("State: " + this.currentState.name());
+        System.out.println("Action: " + this.actionPerformed.name());
+        System.out.println();
+        this.distanceRaced = sensorModel.getDistanceRaced();
+//        if (this.distanceRaced < (this.trackLenght - 0.1)) {
         // check if car is currently stuck
         if (Math.abs(sensorModel.getAngleToTrackAxis()) > stuckAngle) {
             // update stuck counter
@@ -142,15 +163,22 @@ public class TurnerDriver extends Controller {
             // build a CarControl variable and return it
             Action action = new Action();
             action.gear = gear;
-            this.lastState = currentState;
+            /* Update variables for steer control system -------------------------------------------------- */
             this.currentState = SteerControlVariables.evaluateSteerState(sensorModel);
             this.actionPerformed = this.steerControlSystem.nextOnlyBestAction(currentState);
             action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.actionPerformed);
+            /* ------------------------------------------------------------------------------------------- */
             action.accelerate = accel;
             action.brake = brake;
             action.clutch = clutch;
             return action;
         }
+//        } else {
+//            this.laps++;
+//            Action action = new Action();
+//            action.restartRace = true;
+//            return action;
+//        }
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -160,7 +188,12 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.lastState = SteerControlVariables.States.STARTING_GRID;
+        this.currentState = lastState;
+        this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.epochs++;
+        String newResults = this.generateStatistics();
+        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -172,7 +205,9 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void shutdown() {
-        this.steerControlSystem.result(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.epochs++;
+        String newResults = this.generateStatistics();
+        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
         System.out.println("Bye bye!");
     }
 
@@ -362,5 +397,15 @@ public class TurnerDriver extends Controller {
             return 0;
         else
             return brake;
+    }
+
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    private String generateStatistics() {
+        return getTrackName() + SEPARATOR
+                + this.maxEpochs + SEPARATOR
+                + this.epochs + SEPARATOR
+                + this.distanceRaced + SEPARATOR
+                + this.laps;
     }
 }

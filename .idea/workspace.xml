@@ -5,12 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Creado Driver de test que gestiona el control de giro">
+      <change afterPath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTest.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTrain.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/resources/.gitkeep" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/resources/steerQTable.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/resources/steerStatisticsTest.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/mdp/resources/steerStatisticsTrain.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/9/2/924f089edb4af5ee45c8a9d1129cd28e2b368138" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/a/5/a5cc2925ca8258af241be7e5b0381edf30266302" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/d/7/d7b8ea38e6d876bcca51f36f63e0dbc0a3b33011" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/QLearning.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/QLearning.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/steerQTable.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/QLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
@@ -47,16 +56,23 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/WORKSPACE/AA-Torcs",
+    "last_opened_file_path": "C:/WORKSPACE/AA-Torcs/classes/mdp/resources",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "database.data.views",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\WORKSPACE\AA-Torcs\classes\mdp\resources" />
+      <recent name="C:\WORKSPACE\AA-Torcs\src\mdp\resources" />
+    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="drivers.trainer" />
     </key>
@@ -72,6 +88,8 @@
       <workItem from="1686737503714" duration="69000" />
       <workItem from="1686737591253" duration="39000" />
       <workItem from="1686737767471" duration="21657000" />
+      <workItem from="1686842450916" duration="13979000" />
+      <workItem from="1686899248423" duration="22815000" />
     </task>
     <task id="LOCAL-00001" summary="Primer commit de creación del proyecto">
       <created>1686738140221</created>
