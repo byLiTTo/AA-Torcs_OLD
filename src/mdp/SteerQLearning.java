@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class QLearning {
+public class SteerQLearning {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -23,7 +23,7 @@ public class QLearning {
     private Random random;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public QLearning(String filePath) {
+    public SteerQLearning(String filePath) {
         this.qTable = new HashMap<>();
         this.possibleActions = Arrays.asList(Actions.values());
 
@@ -40,7 +40,7 @@ public class QLearning {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-    public QLearning(String filePath, int maxEpochs) {
+    public SteerQLearning(String filePath, int maxEpochs) {
         this.qTable = new HashMap<>();
         this.possibleActions = Arrays.asList(Actions.values());
 

@@ -5,7 +5,7 @@ package drivers.trainer;
 import champ2011client.Action;
 import champ2011client.Controller;
 import champ2011client.SensorModel;
-import mdp.QLearning;
+import mdp.SteerQLearning;
 import mdp.SteerControlVariables;
 
 import static mdp.SteerControlVariables.*;
@@ -30,7 +30,7 @@ public class TurnerDriver extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
     final float maxSpeedDist = 70;
-    final float maxSpeed = 150;
+    final float maxSpeed = 50;
     final float sin5 = (float) 0.08716;
     final float cos5 = (float) 0.99619;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -56,7 +56,7 @@ public class TurnerDriver extends Controller {
     final float clutchMaxTime = (float) 1.5;
     private final double trackLenght = 2057.56;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private final QLearning steerControlSystem;
+    private final SteerQLearning steerControlSystem;
     private int stuck = 0;
     // current clutch
     private float clutch = 0;
@@ -78,7 +78,7 @@ public class TurnerDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public TurnerDriver() {
-        this.steerControlSystem = new QLearning(STEER_Q_TABLE_PATH, this.rangeEpochs);
+        this.steerControlSystem = new SteerQLearning(STEER_Q_TABLE_PATH, this.rangeEpochs);
         this.lastState = SteerControlVariables.States.STARTING_GRID;
         this.currentState = lastState;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
@@ -181,15 +181,15 @@ public class TurnerDriver extends Controller {
                     );
                     action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.actionPerformed);
                     /* ------------------------------------------------------------------------------------------- */
-//                    if (sensorModel.getSpeed() < this.maxSpeed) {
-//                        action.accelerate = 1;
-//                    }
-//                    action.gear = 1;
+                    if (sensorModel.getSpeed() < this.maxSpeed) {
+                        action.accelerate = 1;
+                    }
+                    action.gear = 1;
 
-                    action.accelerate = accel;
-                    action.gear = gear;
-                    action.brake = brake;
-                    action.clutch = clutch;
+//                    action.accelerate = accel;
+//                    action.gear = gear;
+//                    action.brake = brake;
+//                    action.clutch = clutch;
 
                     return action;
                 }

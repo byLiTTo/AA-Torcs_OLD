@@ -187,8 +187,7 @@ public class Client {
     private static Controller load(String name) {
         Controller controller = null;
         try {
-            controller = (Controller) (Object) Class.forName(name)
-                    .newInstance();
+            controller = (Controller) (Object) Class.forName(name).newInstance();
         } catch (ClassNotFoundException e) {
             System.out.println(name + " is not a class name");
             System.exit(0);

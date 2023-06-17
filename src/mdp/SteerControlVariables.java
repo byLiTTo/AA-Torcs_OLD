@@ -101,13 +101,16 @@ public class SteerControlVariables {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public enum Actions {
-        KEEP_STEERING_WHEEL_STRAIGHT, TURN_STEERING_WHEEL,
+        KEEP_STEERING_WHEEL_STRAIGHT,
+        TURN_STEERING_WHEEL,
 //        TURN_STEERING_WHEEL_SHARPLY
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public enum States {
-        STARTING_GRID, LEFT_ROAD_AXIS, //        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
+        STARTING_GRID,
+        LEFT_ROAD_AXIS,
+        //        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
         RIGHT_ROAD_AXIS,
 //        RIGHT_ROAD_AXIS_WHEEL_BLOCKING
     }
