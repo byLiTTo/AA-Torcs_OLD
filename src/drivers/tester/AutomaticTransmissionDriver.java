@@ -20,7 +20,7 @@ import static mdp.SteerControlVariables.STEER_STATISTICS_TEST_PATH;
  * The TurnerDriver class represents a controller for a racing car in the Car Racing Competition 2011.
  * It utilizes a Q-learning algorithm for steering control and makes decisions based on sensor inputs.
  */
-public class RunnerDriver extends Controller {
+public class AutomaticTransmissionDriver extends Controller {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Gear Changing Constants */
@@ -34,8 +34,8 @@ public class RunnerDriver extends Controller {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
-    final float maxSpeedDist = 70;
-    final float maxSpeed = 150;
+    final float maxSpeedDist = 270;
+    final float maxSpeed = 350;
     final float sin5 = (float) 0.08716;
     final float cos5 = (float) 0.99619;
 
@@ -92,7 +92,7 @@ public class RunnerDriver extends Controller {
     /**
      * Constructs a new instance of the TurnerDriver.
      */
-    public RunnerDriver() {
+    public AutomaticTransmissionDriver() {
         this.steerControlSystem = new SteerQLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
         this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;

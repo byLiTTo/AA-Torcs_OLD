@@ -4,28 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Terminada fase de implementacion de train y test del control de giro">
-      <change afterPath="$PROJECT_DIR$/src/drivers/tester/RunnerDriver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mdp/AccelControlVariables.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mdp/AccelQLearning.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mdp/resources/accelQTable.csv" afterDir="false" />
+    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Terminada fase de implementacion de test del control de velocidad">
+      <change afterPath="$PROJECT_DIR$/src/drivers/tester/ManualTransmissionDriver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/drivers/trainer/AutomaticTransmissionDriver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/drivers/trainer/RunnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/champ2011client/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/champ2011client/Client.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/champ2011client/MessageParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/champ2011client/MessageParser.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$Actions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$States.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/accelQTable.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/accelStatisticsTest.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/accelStatisticsTest.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerQTable.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTest.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTest.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTrain.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTrain.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/MessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/champ2011client/MessageParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/tester/RunnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/AutomaticTransmissionDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/QLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerQLearning.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/resources/steerQTable.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/resources/steerQTable.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/AccelControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/AccelControlVariables.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,8 +71,9 @@
       <recent name="C:\WORKSPACE\AA-Torcs\classes\mdp\resources" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="mdp" />
+      <recent name="drivers.tester" />
       <recent name="drivers.trainer" />
+      <recent name="mdp" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -95,7 +90,7 @@
       <workItem from="1686842450916" duration="13979000" />
       <workItem from="1686899248423" duration="26126000" />
       <workItem from="1686940668629" duration="4145000" />
-      <workItem from="1686992643906" duration="4595000" />
+      <workItem from="1686992643906" duration="14617000" />
     </task>
     <task id="LOCAL-00001" summary="Primer commit de creación del proyecto">
       <created>1686738140221</created>
@@ -132,7 +127,14 @@
       <option name="project" value="LOCAL" />
       <updated>1686923995993</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Terminada fase de implementacion de test del control de velocidad">
+      <created>1686999520416</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1686999520416</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -144,7 +146,8 @@
     <MESSAGE value="Creado paquete QLearning" />
     <MESSAGE value="Creado Driver de test que gestiona el control de giro" />
     <MESSAGE value="Terminada fase de implementacion de train y test del control de giro" />
-    <option name="LAST_COMMIT_MESSAGE" value="Terminada fase de implementacion de train y test del control de giro" />
+    <MESSAGE value="Terminada fase de implementacion de test del control de velocidad" />
+    <option name="LAST_COMMIT_MESSAGE" value="Terminada fase de implementacion de test del control de velocidad" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

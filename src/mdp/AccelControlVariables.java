@@ -15,8 +15,8 @@ public class AccelControlVariables {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
-    static final float maxSpeedDist = 70;
-    static final float maxSpeed = 150;
+    static final float maxSpeedDist = 170;
+    static final float maxSpeed = 250;
     static final float sin5 = (float) 0.08716;
     static final float cos5 = (float) 0.99619;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -191,7 +191,54 @@ public class AccelControlVariables {
      * @return The calculated reward value.
      */
     public static double calculateReward(SensorModel lastSensorModel, SensorModel currentSensorModel) {
-        return 0.0;
+        if (lastSensorModel == null) {
+            return 0.0;
+        } else {
+            if (Math.abs(lastSensorModel.getTrackPosition()) >= 1) {
+                if (lastSensorModel.getSpeed() == currentSensorModel.getSpeed()) return 100.0;
+                else return -10.0;
+            } else {
+                // reading of sensor at +5 degree w.r.t. car axis
+                float rxSensor = (float) lastSensorModel.getTrackEdgeSensors()[10];
+                // reading of sensor parallel to car axis
+                float sensorsensor = (float) lastSensorModel.getTrackEdgeSensors()[9];
+                // reading of sensor at -5 degree w.r.t. car axis
+                float sxSensor = (float) lastSensorModel.getTrackEdgeSensors()[8];
+
+                float targetSpeed;
+                if (sensorsensor > maxSpeedDist || (sensorsensor >= rxSensor && sensorsensor >= sxSensor)) {
+                    if (lastSensorModel.getSpeed() < currentSensorModel.getSpeed()) return 100.0;
+                    else return -10.0;
+                } else {
+                    // approaching a turn on right
+                    if (rxSensor > sxSensor) {
+                        // computing approximately the "angle" of turn
+                        float h = sensorsensor * sin5;
+                        float b = rxSensor - sensorsensor * cos5;
+                        float sinAngle = b * b / (h * h + b * b);
+                        // estimate the target speed depending on turn and on how close it is
+                        targetSpeed = maxSpeed * (sensorsensor * sinAngle / maxSpeedDist);
+                    }
+                    // approaching a turn on left
+                    else {
+                        // computing approximately the "angle" of turn
+                        float h = sensorsensor * sin5;
+                        float b = sxSensor - sensorsensor * cos5;
+                        float sinAngle = b * b / (h * h + b * b);
+                        // estimate the target speed depending on turn and on how close it is
+                        targetSpeed = maxSpeed * (sensorsensor * sinAngle / maxSpeedDist);
+                    }
+                    targetSpeed = (float) (2 / (1 + Math.exp(lastSensorModel.getSpeed() - targetSpeed)) - 1);
+                    if (targetSpeed > 0) {
+                        if (lastSensorModel.getSpeed() < currentSensorModel.getSpeed()) return 100.0;
+                        else return -10.0;
+                    } else {
+                        if (lastSensorModel.getSpeed() > currentSensorModel.getSpeed()) return 100.0;
+                        else return -10.0;
+                    }
+                }
+            }
+        }
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
