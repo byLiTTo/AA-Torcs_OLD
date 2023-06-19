@@ -1,17 +1,8 @@
 package mdp;
 
-import champ2011client.SensorModel;
+import torcs.SensorModel;
 
 public class SteerControlVariables {
-
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public static final String SEPARATOR = ",";
-    public static final double INITIAL_EPSILON = 0.85;
-    public static final double LEARNING_RATE = 0.7;
-    public static final double DISCOUNT_FACTOR = 0.95;
-    public static final String STEER_Q_TABLE_PATH = System.getProperty("user.dir") + "/mdp/resources/steerQTable.csv";
-    public static final String STEER_STATISTICS_TRAIN_PATH = System.getProperty("user.dir") + "/mdp/resources/steerStatisticsTrain.csv";
-    public static final String STEER_STATISTICS_TEST_PATH = System.getProperty("user.dir") + "/mdp/resources/steerStatisticsTest.csv";
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Steering constants*/
@@ -22,15 +13,11 @@ public class SteerControlVariables {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public static SteerControlVariables.States evaluateSteerState(SensorModel sensorModel) {
         if (sensorModel.getAngleToTrackAxis() < 0) {
-//            if (sensorModel.getSpeed() > steerSensitivityOffset)
-//                return States.LEFT_ROAD_AXIS_WHEEL_BLOCKING;
-//            else
-            return States.LEFT_ROAD_AXIS;
+            if (sensorModel.getSpeed() > steerSensitivityOffset) return States.LEFT_ROAD_AXIS_WHEEL_BLOCKING;
+            else return States.LEFT_ROAD_AXIS;
         } else {
-//            if (sensorModel.getSpeed() > steerSensitivityOffset)
-//                return States.RIGHT_ROAD_AXIS_WHEEL_BLOCKING;
-//            else
-            return States.RIGHT_ROAD_AXIS;
+            if (sensorModel.getSpeed() > steerSensitivityOffset) return States.RIGHT_ROAD_AXIS_WHEEL_BLOCKING;
+            else return States.RIGHT_ROAD_AXIS;
         }
     }
 
@@ -103,16 +90,16 @@ public class SteerControlVariables {
     public enum Actions {
         KEEP_STEERING_WHEEL_STRAIGHT,
         TURN_STEERING_WHEEL,
-//        TURN_STEERING_WHEEL_SHARPLY
+        TURN_STEERING_WHEEL_SHARPLY
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public enum States {
         STARTING_GRID,
         LEFT_ROAD_AXIS,
-        //        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
+        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
         RIGHT_ROAD_AXIS,
-//        RIGHT_ROAD_AXIS_WHEEL_BLOCKING
+        RIGHT_ROAD_AXIS_WHEEL_BLOCKING
     }
 
 }

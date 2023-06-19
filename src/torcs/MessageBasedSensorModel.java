@@ -1,4 +1,4 @@
-package champ2011client;
+package torcs;
 
 
 /**

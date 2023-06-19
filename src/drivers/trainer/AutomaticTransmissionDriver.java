@@ -2,17 +2,19 @@ package drivers.trainer;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import champ2011client.Action;
-import champ2011client.Controller;
-import champ2011client.SensorModel;
 import mdp.AccelControlVariables;
-import mdp.AccelQLearning;
+import mdp.QLearning;
 import mdp.SteerControlVariables;
-import mdp.SteerQLearning;
+import torcs.Action;
+import torcs.Controller;
+import torcs.SensorModel;
 
-import static mdp.AccelControlVariables.ACCEL_Q_TABLE_PATH;
-import static mdp.AccelControlVariables.ACCEL_STATISTICS_TEST_PATH;
-import static mdp.SteerControlVariables.*;
+import static mdp.AccelControlVariables.SEPARATOR;
+import static mdp.AccelControlVariables.evaluateAccelState;
+import static mdp.SteerControlVariables.evaluateSteerState;
+import static mdp.SteerControlVariables.steerAction2Double;
+import static torcs.Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM;
+import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
 
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -65,15 +67,15 @@ public class AutomaticTransmissionDriver extends Controller {
     final float clutchMaxTime = (float) 1.5;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* System Control Variables */
-    private final SteerQLearning steerControlSystem;
-    private final AccelQLearning accelControlSystem;
+    private final QLearning steerControlSystem;
+    private final QLearning accelControlSystem;
     private final double trackLenght = 2057.56;
     private int stuck = 0;
     // current clutch
     private float clutch = 0;
-    private States lastSteerState;
-    private States currentSteerState;
-    private Actions steerAction;
+    private SteerControlVariables.States lastSteerState;
+    private SteerControlVariables.States currentSteerState;
+    private SteerControlVariables.Actions steerAction;
     private double steerReward;
     private AccelControlVariables.States lastAccelState;
     private AccelControlVariables.States currentAccelState;
@@ -97,11 +99,11 @@ public class AutomaticTransmissionDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public AutomaticTransmissionDriver() {
-        this.steerControlSystem = new SteerQLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
-        this.currentSteerState = States.STARTING_GRID;
-        this.steerAction = Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM, rangeEpochs);
+        this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
+        this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
 
-        this.accelControlSystem = new AccelQLearning(AccelControlVariables.ACCEL_Q_TABLE_PATH, rangeEpochs);
+        this.accelControlSystem = new QLearning(ACCELERATION_CONTROL_SYSTEM, rangeEpochs);
         this.currentAccelState = AccelControlVariables.States.IN_STRAIGHT_LINE;
         this.accelAction = AccelControlVariables.Actions.PRESS_FULL_THROTTLE;
 
@@ -186,7 +188,7 @@ public class AutomaticTransmissionDriver extends Controller {
                         this.lastSteerState = this.currentSteerState;
                         this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
                         this.steerReward = SteerControlVariables.calculateReward(this.lastSensorModel, sensorModel);
-                        this.steerAction = this.steerControlSystem.Update(
+                        this.steerAction = (SteerControlVariables.Actions) this.steerControlSystem.Update(
                                 this.lastSteerState,
                                 this.currentSteerState,
                                 this.steerAction,
@@ -199,7 +201,7 @@ public class AutomaticTransmissionDriver extends Controller {
                         this.lastAccelState = this.currentAccelState;
                         this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
                         this.accelReward = AccelControlVariables.calculateReward(this.lastSensorModel, this.currentSensorModel);
-                        this.accelAction = this.accelControlSystem.Update(
+                        this.accelAction = (AccelControlVariables.Actions) this.accelControlSystem.Update(
                                 this.lastAccelState,
                                 this.currentAccelState,
                                 this.accelAction,
@@ -211,12 +213,12 @@ public class AutomaticTransmissionDriver extends Controller {
                         /* -------------------------------------------------------------------------------------------- */
                     } else {
                         /* Update variables for steer control system -------------------------------------------------- */
-                        this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
-                        this.steerAction = this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
-                        action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.steerAction);
+                        this.currentSteerState = evaluateSteerState(sensorModel);
+                        this.steerAction = (SteerControlVariables.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
+                        action.steering = steerAction2Double(sensorModel, this.steerAction);
                         /* Update variables for accel control system -------------------------------------------------- */
-                        this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
-                        this.accelAction = this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
+                        this.currentAccelState = evaluateAccelState(sensorModel);
+                        this.accelAction = (AccelControlVariables.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
                         Double[] accel_brake = AccelControlVariables.accelAction2Double(sensorModel, this.accelAction);
                         action.accelerate = accel_brake[0];
                         action.brake = accel_brake[1];
@@ -242,16 +244,16 @@ public class AutomaticTransmissionDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.lastSteerState = States.STARTING_GRID;
+        this.lastSteerState = SteerControlVariables.States.STARTING_GRID;
         this.currentSteerState = lastSteerState;
-        this.steerAction = Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.lastAccelState = AccelControlVariables.States.IN_STRAIGHT_LINE;
         this.currentAccelState = this.lastAccelState;
         this.accelAction = AccelControlVariables.Actions.PRESS_FULL_THROTTLE;
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TEST_PATH, newResults);
-        this.accelControlSystem.result(ACCEL_Q_TABLE_PATH, ACCEL_STATISTICS_TEST_PATH, newResults);
+        this.steerControlSystem.saveTable();
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -265,8 +267,8 @@ public class AutomaticTransmissionDriver extends Controller {
     public void shutdown() {
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
-        this.accelControlSystem.result(ACCEL_STATISTICS_TEST_PATH, newResults);
+        this.steerControlSystem.saveTable();
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Bye bye!");
     }
 

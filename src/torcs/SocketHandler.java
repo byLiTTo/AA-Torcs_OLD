@@ -1,7 +1,7 @@
 /**
  *
  */
-package champ2011client;
+package torcs;
 
 import java.io.IOException;
 import java.net.*;

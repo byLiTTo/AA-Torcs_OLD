@@ -1,9 +1,9 @@
 package drivers.tester;
 
 
-import champ2011client.Action;
-import champ2011client.Controller;
-import champ2011client.SensorModel;
+import torcs.Action;
+import torcs.Controller;
+import torcs.SensorModel;
 
 /**
  * Created by IntelliJ IDEA.

@@ -2,13 +2,14 @@ package drivers.trainer;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import champ2011client.Action;
-import champ2011client.Controller;
-import champ2011client.SensorModel;
-import mdp.SteerQLearning;
-import mdp.SteerControlVariables;
+import mdp.QLearning;
+import torcs.Action;
+import torcs.Controller;
+import torcs.SensorModel;
 
 import static mdp.SteerControlVariables.*;
+import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
+import static torcs.Constants.SEPARATOR;
 
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -56,15 +57,15 @@ public class TurnerDriver extends Controller {
     final float clutchMaxTime = (float) 1.5;
     private final double trackLenght = 2057.56;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private final SteerQLearning steerControlSystem;
+    private final QLearning steerControlSystem;
     private int stuck = 0;
     // current clutch
     private float clutch = 0;
     private SensorModel lastSensorModel;
     private SensorModel currentSensorModel;
-    private SteerControlVariables.States lastState;
-    private SteerControlVariables.States currentState;
-    private SteerControlVariables.Actions actionPerformed;
+    private States lastState;
+    private States currentState;
+    private Actions actionPerformed;
     private int maxEpochs = 20;
     private int rangeEpochs = 15;
     private int epochs;
@@ -78,10 +79,10 @@ public class TurnerDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public TurnerDriver() {
-        this.steerControlSystem = new SteerQLearning(STEER_Q_TABLE_PATH, this.rangeEpochs);
-        this.lastState = SteerControlVariables.States.STARTING_GRID;
+        this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM, this.rangeEpochs);
+        this.lastState = States.STARTING_GRID;
         this.currentState = lastState;
-        this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.actionPerformed = Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.lastSensorModel = null;
         this.currentSensorModel = null;
         this.epochs = 0;
@@ -171,15 +172,15 @@ public class TurnerDriver extends Controller {
                     this.lastSensorModel = this.currentSensorModel;
                     this.currentSensorModel = sensorModel;
                     this.lastState = this.currentState;
-                    this.currentState = SteerControlVariables.evaluateSteerState(sensorModel);
-                    this.lastReward = SteerControlVariables.calculateReward(this.lastSensorModel, sensorModel);
-                    this.actionPerformed = this.steerControlSystem.Update(
+                    this.currentState = evaluateSteerState(sensorModel);
+                    this.lastReward = calculateReward(this.lastSensorModel, sensorModel);
+                    this.actionPerformed = (Actions) (this.steerControlSystem.Update(
                             this.lastState,
                             this.currentState,
                             this.actionPerformed,
                             this.lastReward
-                    );
-                    action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.actionPerformed);
+                    ));
+                    action.steering = steerAction2Double(sensorModel, this.actionPerformed);
                     /* ------------------------------------------------------------------------------------------- */
                     if (sensorModel.getSpeed() < this.maxSpeed) {
                         action.accelerate = 1;
@@ -210,13 +211,13 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.lastState = SteerControlVariables.States.STARTING_GRID;
+        this.lastState = States.STARTING_GRID;
         this.currentState = lastState;
-        this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.actionPerformed = Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.epochs++;
         this.lastReward = 0;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TRAIN_PATH, newResults);
+        this.steerControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -230,7 +231,7 @@ public class TurnerDriver extends Controller {
     public void shutdown() {
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TRAIN_PATH, newResults);
+        this.steerControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Bye bye!");
     }
 

@@ -2,17 +2,16 @@ package drivers.trainer;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import champ2011client.Action;
-import champ2011client.Controller;
-import champ2011client.SensorModel;
 import mdp.AccelControlVariables;
-import mdp.AccelQLearning;
+import mdp.QLearning;
 import mdp.SteerControlVariables;
-import mdp.SteerQLearning;
+import torcs.Action;
+import torcs.Controller;
+import torcs.SensorModel;
 
-import static mdp.AccelControlVariables.ACCEL_Q_TABLE_PATH;
-import static mdp.AccelControlVariables.ACCEL_STATISTICS_TEST_PATH;
-import static mdp.SteerControlVariables.*;
+import static torcs.Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM;
+import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
+import static torcs.Constants.SEPARATOR;
 
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -65,8 +64,8 @@ public class RunnerDriver extends Controller {
     final float clutchMaxTime = (float) 1.5;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* System Control Variables */
-    private final SteerQLearning steerControlSystem;
-    private final AccelQLearning accelControlSystem;
+    private final QLearning steerControlSystem;
+    private final QLearning accelControlSystem;
     private final double trackLenght = 2057.56;
     private int stuck = 0;
     // current clutch
@@ -96,11 +95,11 @@ public class RunnerDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public RunnerDriver() {
-        this.steerControlSystem = new SteerQLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM);
         this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
 
-        this.accelControlSystem = new AccelQLearning(AccelControlVariables.ACCEL_Q_TABLE_PATH, rangeEpochs);
+        this.accelControlSystem = new QLearning(ACCELERATION_CONTROL_SYSTEM, rangeEpochs);
         this.currentAccelState = AccelControlVariables.States.IN_STRAIGHT_LINE;
         this.accelAction = AccelControlVariables.Actions.PRESS_FULL_THROTTLE;
 
@@ -172,7 +171,7 @@ public class RunnerDriver extends Controller {
                 action.gear = gear;
                 /* Update variables for steer control system -------------------------------------------------- */
                 this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
-                this.steerAction = this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
+                this.steerAction = (SteerControlVariables.Actions) (this.steerControlSystem.nextOnlyBestAction(this.currentSteerState));
                 action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.steerAction);
                 /* Update variables for accel control system -------------------------------------------------- */
                 this.lastSensorModel = this.currentSensorModel;
@@ -180,12 +179,12 @@ public class RunnerDriver extends Controller {
                 this.lastAccelState = this.currentAccelState;
                 this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
                 this.accelReward = AccelControlVariables.calculateReward(this.lastSensorModel, this.currentSensorModel);
-                this.accelAction = this.accelControlSystem.Update(
+                this.accelAction = (AccelControlVariables.Actions) (this.accelControlSystem.Update(
                         this.lastAccelState,
                         this.currentAccelState,
                         this.accelAction,
                         this.accelReward
-                );
+                ));
                 Double[] accel_brake = AccelControlVariables.accelAction2Double(this.currentSensorModel, this.accelAction);
                 action.accelerate = accel_brake[0];
                 action.brake = accel_brake[1];
@@ -216,8 +215,7 @@ public class RunnerDriver extends Controller {
         this.accelAction = AccelControlVariables.Actions.PRESS_FULL_THROTTLE;
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_Q_TABLE_PATH, STEER_STATISTICS_TEST_PATH, newResults);
-        this.accelControlSystem.result(ACCEL_Q_TABLE_PATH, ACCEL_STATISTICS_TEST_PATH, newResults);
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -231,8 +229,7 @@ public class RunnerDriver extends Controller {
     public void shutdown() {
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
-        this.accelControlSystem.result(ACCEL_STATISTICS_TEST_PATH, newResults);
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
         System.out.println("Bye bye!");
     }
 

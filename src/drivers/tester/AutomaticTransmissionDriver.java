@@ -2,17 +2,15 @@ package drivers.tester;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import champ2011client.Action;
-import champ2011client.Controller;
-import champ2011client.SensorModel;
-import mdp.AccelControlVariables;
-import mdp.AccelQLearning;
-import mdp.SteerControlVariables;
-import mdp.SteerQLearning;
+import mdp.*;
+import torcs.Action;
+import torcs.Constants;
+import torcs.Controller;
+import torcs.SensorModel;
 
-import static mdp.SteerControlVariables.SEPARATOR;
-import static mdp.SteerControlVariables.STEER_STATISTICS_TEST_PATH;
-
+import static torcs.Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM;
+import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
+import static torcs.Constants.SEPARATOR;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -64,8 +62,8 @@ public class AutomaticTransmissionDriver extends Controller {
     final float clutchMaxTime = (float) 1.5;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* System Control Variables */
-    private final SteerQLearning steerControlSystem;
-    private final AccelQLearning accelControlSystem;
+    private final QLearning steerControlSystem;
+    private final QLearning accelControlSystem;
     private final double trackLenght = 2057.56;
     private int stuck = 0;
     // current clutch
@@ -93,18 +91,13 @@ public class AutomaticTransmissionDriver extends Controller {
      * Constructs a new instance of the TurnerDriver.
      */
     public AutomaticTransmissionDriver() {
-        this.steerControlSystem = new SteerQLearning(SteerControlVariables.STEER_Q_TABLE_PATH);
+        this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM);
         this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
 
-        this.accelControlSystem = new AccelQLearning(AccelControlVariables.ACCEL_Q_TABLE_PATH);
+        this.accelControlSystem = new QLearning(ACCELERATION_CONTROL_SYSTEM);
         this.currentAccelState = AccelControlVariables.States.OFF_TRACK;
         this.accelAction = AccelControlVariables.Actions.ACTIVE_LIMITER;
-        this.accelControlSystem.result(
-                AccelControlVariables.ACCEL_Q_TABLE_PATH,
-                AccelControlVariables.ACCEL_STATISTICS_TEST_PATH,
-                ""
-        );
 
         this.epochs = 0;
         this.laps = 0;
@@ -174,11 +167,11 @@ public class AutomaticTransmissionDriver extends Controller {
             action.gear = gear;
             /* Update variables for steer control system -------------------------------------------------- */
             this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
-            this.steerAction = this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
+            this.steerAction = (SteerControlVariables.Actions)this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
             action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.steerAction);
             /* Update variables for accel control system -------------------------------------------------- */
             this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
-            this.accelAction = this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
+            this.accelAction = (AccelControlVariables.Actions)this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
             Double[] accel_brake = AccelControlVariables.accelAction2Double(sensorModel, this.accelAction);
             action.accelerate = accel_brake[0];
             action.brake = accel_brake[1];
@@ -206,7 +199,7 @@ public class AutomaticTransmissionDriver extends Controller {
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
+        this.steerControlSystem.saveStatistics(newResults);
         System.out.println("Restarting the race!");
 
     }
@@ -220,7 +213,7 @@ public class AutomaticTransmissionDriver extends Controller {
     public void shutdown() {
         this.epochs++;
         String newResults = this.generateStatistics();
-        this.steerControlSystem.result(STEER_STATISTICS_TEST_PATH, newResults);
+        this.steerControlSystem.saveStatistics(newResults);
         System.out.println("Bye bye!");
     }
 

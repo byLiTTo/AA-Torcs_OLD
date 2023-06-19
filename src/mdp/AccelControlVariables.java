@@ -1,6 +1,6 @@
 package mdp;
 
-import champ2011client.SensorModel;
+import torcs.SensorModel;
 
 public class AccelControlVariables {
 

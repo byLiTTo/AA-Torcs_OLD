@@ -1,9 +1,9 @@
 /**
  *
  */
-package champ2011client;
+package torcs;
 
-import champ2011client.Controller.Stage;
+import torcs.Controller.Stage;
 
 import java.util.StringTokenizer;
 
