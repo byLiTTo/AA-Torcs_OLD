@@ -5,15 +5,6 @@ import torcs.SensorModel;
 public class AccelControlVariables {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public static final String SEPARATOR = ",";
-    public static final double INITIAL_EPSILON = 0.85;
-    public static final double LEARNING_RATE = 0.7;
-    public static final double DISCOUNT_FACTOR = 0.95;
-    public static final String ACCEL_Q_TABLE_PATH = System.getProperty("user.dir") + "/mdp/resources/accelQTable.csv";
-    public static final String ACCEL_STATISTICS_TRAIN_PATH = System.getProperty("user.dir") + "/mdp/resources/accelStatisticsTrain.csv";
-    public static final String ACCEL_STATISTICS_TEST_PATH = System.getProperty("user.dir") + "/mdp/resources/accelStatisticsTest.csv";
-
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
     static final float maxSpeedDist = 170;
     static final float maxSpeed = 250;

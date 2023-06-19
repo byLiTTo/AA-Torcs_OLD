@@ -6,15 +6,16 @@ import mdp.AccelControlVariables;
 import mdp.QLearning;
 import mdp.SteerControlVariables;
 import torcs.Action;
+import torcs.Constants;
 import torcs.Controller;
 import torcs.SensorModel;
 
-import static mdp.AccelControlVariables.SEPARATOR;
 import static mdp.AccelControlVariables.evaluateAccelState;
 import static mdp.SteerControlVariables.evaluateSteerState;
 import static mdp.SteerControlVariables.steerAction2Double;
 import static torcs.Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM;
 import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
+import static torcs.Constants.SEPARATOR;
 
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -124,7 +125,7 @@ public class AutomaticTransmissionDriver extends Controller {
     public Action control(SensorModel sensorModel) {
 
         int currentLaps = (int) (sensorModel.getDistanceRaced() / this.trackLenght);
-        if (currentLaps <= this.laps) {
+        if (currentLaps < this.laps) {
             if (Math.abs(sensorModel.getTrackPosition()) >= 1) {
 //                this.steerControlSystem.lastUpdate(this.actionPerformed, -1000.0);
                 Action action = new Action();
@@ -175,7 +176,7 @@ public class AutomaticTransmissionDriver extends Controller {
                     action.gear = gear;
 
                     long timeTranscurred = (System.currentTimeMillis() - this.currentTime);
-                    if (timeTranscurred > 40) {
+                    if (timeTranscurred > 1) {
                         this.currentTime = System.currentTimeMillis();
                         System.out.println("EPOCH: " + (this.epochs + 1) + "/" + this.maxEpochs);
                         System.out.println("Complete Laps: " + laps);

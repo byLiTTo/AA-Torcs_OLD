@@ -4,50 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="Terminada fase de implementacion de test y train del control de velocidad">
-      <change afterPath="$PROJECT_DIR$/src/mdp/ClutchControlVariables.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/mdp/resources/QTable_Steer.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/torcs/Constants.java" afterDir="false" />
+    <list default="true" id="ff064c67-d742-4aa2-865c-e6385324a9a9" name="Changes" comment="ManualTransmissionDrive creado">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/AutomaticTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/AutomaticTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/DeadSimpleSoloController.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/DeadSimpleSoloController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/SimpleDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/SimpleDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/tester/TurnerDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/drivers/trainer/AutomaticTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/trainer/AutomaticTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/trainer/RunnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/trainer/RunnerDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/trainer/TurnerDriver.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$Actions.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables$States.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControlVariables.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControlVariables.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/mdp/QLearning.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/QLearning.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$Actions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables$States.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/SteerControlVariables.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/SteerControlVariables.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/accelQTable.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/accelStatisticsTest.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerQTable.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTest.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/steerStatisticsTrain.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Action.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/MessageBasedSensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/MessageBasedSensorModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/MessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/MessageParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/SensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/SensorModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/champ2011client/SocketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/SocketHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/tester/AutomaticTransmissionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/AutomaticTransmissionDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/tester/DeadSimpleSoloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/DeadSimpleSoloController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/QTable_Accel.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/QTable_Steer.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTest.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTest.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/torcs/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/torcs/Constants.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/tester/ManualTransmissionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/ManualTransmissionDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/tester/SimpleDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/SimpleDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/tester/TurnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/trainer/AutomaticTransmissionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/AutomaticTransmissionDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/trainer/RunnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/RunnerDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/trainer/TurnerDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/AccelControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/AccelControlVariables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/AccelQLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/AccelQLearning.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerControlVariables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/SteerQLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerQLearning.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/resources/accelQTable.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/resources/QTable_Accel.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/mdp/resources/steerQTable.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/ClutchControlVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/ClutchControlVariables.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Constants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +92,7 @@
       <workItem from="1686899248423" duration="26126000" />
       <workItem from="1686940668629" duration="4145000" />
       <workItem from="1686992643906" duration="21144000" />
-      <workItem from="1687096276965" duration="9253000" />
+      <workItem from="1687096276965" duration="14104000" />
     </task>
     <task id="LOCAL-00001" summary="Primer commit de creación del proyecto">
       <created>1686738140221</created>
@@ -170,7 +143,14 @@
       <option name="project" value="LOCAL" />
       <updated>1687017192483</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="ManualTransmissionDrive creado">
+      <created>1687190239008</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1687190239008</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,7 +164,8 @@
     <MESSAGE value="Terminada fase de implementacion de train y test del control de giro" />
     <MESSAGE value="Terminada fase de implementacion de test del control de velocidad" />
     <MESSAGE value="Terminada fase de implementacion de test y train del control de velocidad" />
-    <option name="LAST_COMMIT_MESSAGE" value="Terminada fase de implementacion de test y train del control de velocidad" />
+    <MESSAGE value="ManualTransmissionDrive creado" />
+    <option name="LAST_COMMIT_MESSAGE" value="ManualTransmissionDrive creado" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
