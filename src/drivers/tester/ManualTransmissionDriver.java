@@ -2,14 +2,20 @@ package drivers.tester;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import mdp.*;
+import static torcs.Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM;
+import static torcs.Constants.ControlSystems.CLUTCH_CONTROL_SYSTEM;
+import static torcs.Constants.ControlSystems.STEERING_CONTROL_SYSTEM;
+import static torcs.Constants.SEPARATOR;
+
+import mdp.AccelControlVariables;
+import mdp.ClutchControlVariables;
+import mdp.ClutchControlVariables.Actions;
+import mdp.ClutchControlVariables.States;
+import mdp.QLearning;
+import mdp.SteerControlVariables;
 import torcs.Action;
-import torcs.Constants;
 import torcs.Controller;
 import torcs.SensorModel;
-
-import static torcs.Constants.ControlSystems.*;
-import static torcs.Constants.SEPARATOR;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
@@ -104,8 +110,8 @@ public class ManualTransmissionDriver extends Controller {
         this.accelAction = AccelControlVariables.Actions.ACTIVE_LIMITER;
 
         this.clutchControlSystem = new QLearning(CLUTCH_CONTROL_SYSTEM);
-        this.currentClutchState = ClutchControlVariables.States.IN_STRAIGHT_LINE;
-        this.clutchAction = ClutchControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
+        this.currentClutchState = States.STARTING_GRID;
+        this.clutchAction = Actions.RACE_START;
 
         this.epochs = 0;
         this.laps = 0;
@@ -170,19 +176,24 @@ public class ManualTransmissionDriver extends Controller {
             Action action = new Action();
             /* Update variables for steer control system ------------------------------------------------------------ */
             this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
-            this.steerAction = (SteerControlVariables.Actions)this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
+            this.steerAction = (SteerControlVariables.Actions) this.steerControlSystem.nextOnlyBestAction(
+                    this.currentSteerState);
             action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.steerAction);
             /* Update variables for accel control system ------------------------------------------------------------ */
             this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
-            this.accelAction = (AccelControlVariables.Actions)this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
+            this.accelAction = (AccelControlVariables.Actions) this.accelControlSystem.nextOnlyBestAction(
+                    this.currentAccelState);
             Double[] accel_brake = AccelControlVariables.accelAction2Double(sensorModel, this.accelAction);
             action.accelerate = accel_brake[0];
             action.brake = accel_brake[1];
             /* Update variables for clutch control system ----------------------------------------------------------- */
-
-            int gear = getGear(sensorModel);
-            clutch = clutching(sensorModel, clutch);
-            action.gear = gear;
+            this.currentClutchState = ClutchControlVariables.evaluateClutchState(sensorModel);
+            this.clutchAction = (ClutchControlVariables.Actions) this.clutchControlSystem.nextOnlyBestAction(
+                    this.currentClutchState);
+            Float[] gear_clutch = ClutchControlVariables.clutchAction2Double(sensorModel, this.clutchAction, clutch);
+            float gear = gear_clutch[0];
+            action.gear = (int) gear;
+            clutch = gear_clutch[1];
             action.clutch = clutch;
             /* ------------------------------------------------------------------------------------------------------ */
             return action;
