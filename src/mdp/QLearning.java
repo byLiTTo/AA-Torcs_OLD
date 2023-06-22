@@ -477,13 +477,15 @@ public class QLearning {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public void saveStatistics(String newResults) {
+//        this.epsilon -= 0.05;
+        this.epsilon = (INITIAL_EPSILON * this.maxEpochs) / (this.maxEpochs + (this.epochs * 4.7));
         this.saveStatistics(STATISTICS_TEST_PATH, newResults);
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public void saveQTableAndStatistics(String newResults) {
         this.epochs++;
-        this.epsilon = (INITIAL_EPSILON * this.maxEpochs) / (this.maxEpochs + (this.epochs * 4.7));
+//        this.epsilon = (INITIAL_EPSILON * this.maxEpochs) / (this.maxEpochs + (this.epochs * 4.7));
         this.saveTable();
         this.saveStatistics(STATISTICS_TRAIN_PATH, newResults);
     }

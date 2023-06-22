@@ -6,7 +6,6 @@ import mdp.AccelControlVariables;
 import mdp.QLearning;
 import mdp.SteerControlVariables;
 import torcs.Action;
-import torcs.Constants;
 import torcs.Controller;
 import torcs.SensorModel;
 
@@ -101,7 +100,7 @@ public class AutomaticTransmissionDriver extends Controller {
      */
     public AutomaticTransmissionDriver() {
         this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM, rangeEpochs);
-        this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
+        this.currentSteerState = SteerControlVariables.States.CENTER_AXIS;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
 
         this.accelControlSystem = new QLearning(ACCELERATION_CONTROL_SYSTEM, rangeEpochs);
@@ -245,7 +244,7 @@ public class AutomaticTransmissionDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.lastSteerState = SteerControlVariables.States.STARTING_GRID;
+        this.lastSteerState = SteerControlVariables.States.CENTER_AXIS;
         this.currentSteerState = lastSteerState;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.lastAccelState = AccelControlVariables.States.IN_STRAIGHT_LINE;

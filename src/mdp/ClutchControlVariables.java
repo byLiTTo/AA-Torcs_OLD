@@ -1,5 +1,6 @@
 package mdp;
 
+import torcs.Controller;
 import torcs.SensorModel;
 
 public class ClutchControlVariables {
@@ -22,7 +23,7 @@ public class ClutchControlVariables {
         int gear = sensorModel.getGear();
         double rpm = sensorModel.getRPM();
         if (gear < 1) {
-            return States.STARTING_GRID;
+            return States.FIRST_GEAR;
         }
         // check if the RPM value of car is greater than the one suggested
         // to shift up the gear from the current one
@@ -39,36 +40,67 @@ public class ClutchControlVariables {
             }
     }
 
-    public static Float[] clutchAction2Double(SensorModel sensorModel, ClutchControlVariables.Actions actionPerformed,
-            float clutch) {
+    public static GearClutch clutchAction2Double(SensorModel sensorModel, ClutchControlVariables.Actions actionPerformed,
+                                                 float clutch, Controller.Stage stage) {
         int gear = sensorModel.getGear();
-        Float[] gear_clucth = new Float[2];
-        gear_clucth[1] = clutching(sensorModel, clutch);
-        if (actionPerformed == Actions.RACE_START) {
-            gear_clucth[0] = 1f;
-        }// check if the RPM value of car is greater than the one suggested
+        float c = clutching(sensorModel, clutch, stage);
+        if (actionPerformed == Actions.IDLE_SPEED) {
+
+            return new GearClutch(1, c);
+        }
+        // check if the RPM value of car is greater than the one suggested
         // to shift up the gear from the current one
         if (actionPerformed == Actions.UP_GEAR) {
-            gear_clucth[0] = gear + 1f;
+            return new GearClutch(gear + 1, c);
         } else
             // check if the RPM value of car is lower than the one suggested
             // to shift down the gear from the current one
             if (actionPerformed == Actions.DOWN_GEAR) {
-                gear_clucth[0] = gear - 1f;
+                return new GearClutch(gear - 1, c);
             } else // otherwhise keep current gear
             {
-                gear_clucth[0] = (float) gear;
+                return new GearClutch(gear, c);
             }
-
-        return gear_clucth;
     }
 
-    private static float clutching(SensorModel sensors, float clutch) {
+    public static double calculateReward(SensorModel lastSensorModel, SensorModel currentSensorModel) {
+        if (lastSensorModel == null) return 0.0;
+        else {
+            int lastGear = lastSensorModel.getGear();
+            int currentGear = currentSensorModel.getGear();
+            double rpm = lastSensorModel.getRPM();
+            if (lastGear == 1 && currentGear == 0) return -100.0;
+            // if gear is 0 (N) or -1 (R) just return 1
+            if (lastGear < 1) {
+                if (currentGear == 1) return 100.0;
+                else return -10.0;
+            }
+            // check if the RPM value of car is greater than the one suggested
+            // to shift up the gear from the current one
+            if (lastGear < 6 && rpm >= gearUp[lastGear - 1]) {
+                if (lastGear < currentGear) return 100.0;
+                else return -10.0;
+            } else
+                // check if the RPM value of car is lower than the one suggested
+                // to shift down the gear from the current one
+                if (lastGear > 1 && rpm <= gearDown[lastGear - 1]) {
+                    if (lastGear > currentGear) return 100.0;
+                    else return -10.0;
+                } else // otherwhise keep current gear
+                {
+                    if (lastGear == currentGear) return 100.0;
+                    else return -10.0;
+                }
+        }
+    }
+
+    private static float clutching(SensorModel sensors, float clutch, Controller.Stage stage) {
 
         float maxClutch = clutchMax;
 
         // Check if the current situation is the race start
         if (sensors.getCurrentLapTime() < clutchDeltaTime
+                && stage == Controller.Stage.RACE
                 && sensors.getDistanceRaced() < clutchDeltaRaced) {
             clutch = maxClutch;
         }
@@ -125,14 +157,14 @@ public class ClutchControlVariables {
     }
 
     public enum Actions {
-        RACE_START,
+        IDLE_SPEED,
         KEEP_GEAR,
         UP_GEAR,
         DOWN_GEAR
     }
 
     public enum States {
-        STARTING_GRID,
+        FIRST_GEAR,
         ENOUGH_RPM_UP,
         REVOLUTIONIZING_ENGINE,
         LOWER_RPM_DOWN

@@ -2,9 +2,10 @@ package drivers.tester;
 
 //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
 
-import mdp.*;
+import mdp.AccelControlVariables;
+import mdp.QLearning;
+import mdp.SteerControlVariables;
 import torcs.Action;
-import torcs.Constants;
 import torcs.Controller;
 import torcs.SensorModel;
 
@@ -92,12 +93,12 @@ public class AutomaticTransmissionDriver extends Controller {
      */
     public AutomaticTransmissionDriver() {
         this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM);
-        this.currentSteerState = SteerControlVariables.States.STARTING_GRID;
+        this.currentSteerState = SteerControlVariables.States.CENTER_AXIS;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
 
         this.accelControlSystem = new QLearning(ACCELERATION_CONTROL_SYSTEM);
-        this.currentAccelState = AccelControlVariables.States.OFF_TRACK;
-        this.accelAction = AccelControlVariables.Actions.ACTIVE_LIMITER;
+        this.currentAccelState = AccelControlVariables.States.IN_STRAIGHT_LINE;
+        this.accelAction = AccelControlVariables.Actions.PRESS_FULL_THROTTLE;
 
         this.epochs = 0;
         this.laps = 0;
@@ -167,11 +168,11 @@ public class AutomaticTransmissionDriver extends Controller {
             action.gear = gear;
             /* Update variables for steer control system -------------------------------------------------- */
             this.currentSteerState = SteerControlVariables.evaluateSteerState(sensorModel);
-            this.steerAction = (SteerControlVariables.Actions)this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
+            this.steerAction = (SteerControlVariables.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
             action.steering = SteerControlVariables.steerAction2Double(sensorModel, this.steerAction);
             /* Update variables for accel control system -------------------------------------------------- */
             this.currentAccelState = AccelControlVariables.evaluateAccelState(sensorModel);
-            this.accelAction = (AccelControlVariables.Actions)this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
+            this.accelAction = (AccelControlVariables.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
             Double[] accel_brake = AccelControlVariables.accelAction2Double(sensorModel, this.accelAction);
             action.accelerate = accel_brake[0];
             action.brake = accel_brake[1];
@@ -194,7 +195,7 @@ public class AutomaticTransmissionDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.lastSteerState = SteerControlVariables.States.STARTING_GRID;
+        this.lastSteerState = SteerControlVariables.States.CENTER_AXIS;
         this.currentSteerState = lastSteerState;
         this.steerAction = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.epochs++;

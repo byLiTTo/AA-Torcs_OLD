@@ -83,7 +83,7 @@ public class TurnerDriver extends Controller {
      */
     public TurnerDriver() {
         this.steerControlSystem = new QLearning(STEERING_CONTROL_SYSTEM);
-        this.currentState = SteerControlVariables.States.STARTING_GRID;
+        this.currentState = SteerControlVariables.States.CENTER_AXIS;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.epochs = 0;
         this.laps = 0;
@@ -186,7 +186,7 @@ public class TurnerDriver extends Controller {
      */
     @Override
     public void reset() {
-        this.lastState = SteerControlVariables.States.STARTING_GRID;
+        this.lastState = SteerControlVariables.States.CENTER_AXIS;
         this.currentState = lastState;
         this.actionPerformed = SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT;
         this.epochs++;

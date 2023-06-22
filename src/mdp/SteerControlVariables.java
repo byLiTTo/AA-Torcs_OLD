@@ -12,33 +12,36 @@ public class SteerControlVariables {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public static SteerControlVariables.States evaluateSteerState(SensorModel sensorModel) {
-        if (sensorModel.getAngleToTrackAxis() < 0) {
-            if (sensorModel.getSpeed() > steerSensitivityOffset) return States.LEFT_ROAD_AXIS_WHEEL_BLOCKING;
-            else return States.LEFT_ROAD_AXIS;
+        if (sensorModel.getAngleToTrackAxis() != 0) {
+//            if (sensorModel.getSpeed() > steerSensitivityOffset) return States.OFF_CENTER_AXIS_HIGH_SPEED;
+//            else
+            return States.OFF_CENTER_AXIS;
         } else {
-            if (sensorModel.getSpeed() > steerSensitivityOffset) return States.RIGHT_ROAD_AXIS_WHEEL_BLOCKING;
-            else return States.RIGHT_ROAD_AXIS;
+            return States.CENTER_AXIS;
         }
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public static double steerAction2Double(SensorModel sensorModel, SteerControlVariables.Actions actionPerformed) {
-        double steer = 0.0;
-        if (actionPerformed != SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT) {
+        if (actionPerformed == SteerControlVariables.Actions.KEEP_STEERING_WHEEL_STRAIGHT) {
+            return 0.0;
+        } else {
+            double steer;
             // steering angle is compute by correcting the actual car angle w.r.t. to track
             // axis [sensors.getAngle()] and to adjust car position w.r.t to middle of track [sensors.getTrackPos()*0.5]
             float targetAngle = (float) (sensorModel.getAngleToTrackAxis() - sensorModel.getTrackPosition() * 0.5);
             // at high speed reduce the steering command to avoid loosing the control
-//            if (actionPerformed == Actions.TURN_STEERING_WHEEL_SHARPLY)
-            if (sensorModel.getSpeed() > steerSensitivityOffset)
+//            if (actionPerformed == Actions.TURN_STEERING_WHEEL_SHARPLY) {
+            if (sensorModel.getSpeed() > steerSensitivityOffset) {
                 steer = (float) (targetAngle / (steerLock * (sensorModel.getSpeed() - steerSensitivityOffset) * wheelSensitivityCoeff));
-            else steer = (targetAngle) / steerLock;
+            } else {
+                steer = (targetAngle) / steerLock;
+            }
+
+            if (steer < -1) steer = -1;
+            if (steer > 1) steer = 1;
+            return steer;
         }
-
-
-        if (steer < -1) steer = -1;
-        if (steer > 1) steer = 1;
-        return steer;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -51,55 +54,40 @@ public class SteerControlVariables {
      * @param currentSensorModel The sensor model representing the current state of the car.
      * @return The calculated reward value.
      */
-    public static double calculateReward(SensorModel lastSensorModel, SensorModel currentSensorModel) {
-        double reward = 0.0;
+    public static double calculateReward(SensorModel lastSensorModel, SensorModel currentSensorModel, double steer) {
         if (lastSensorModel == null) {
-            return reward;
+            return 0.0;
         } else {
             double lastAngle = Math.abs(lastSensorModel.getAngleToTrackAxis());
             double currentAngle = Math.abs(currentSensorModel.getAngleToTrackAxis());
             if (Math.abs(currentSensorModel.getTrackPosition()) >= 1) {
-                reward = -1000.0;
+                return -1000.0;
             } else {
-                if (lastAngle > currentAngle) {
-                    reward = 100;
+                if (steer != 0) {
+                    return 100.0;
                 } else {
-                    reward = -10;
+                    return -100.0;
                 }
             }
         }
-
-
-//        return (reward - 0) / (Double.MAX_VALUE - 0);
-        return reward;
-
-//        if (lastSensorModel == null) {
-//            return 0.0;
-//        } else {
-//            if (Math.abs(currentSensorModel.getTrackPosition()) >= 1) {
-//                return -1000;
-//            } else {
-//                if (lastSensorModel.getAngleToTrackAxis() > currentSensorModel.getAngleToTrackAxis())
-//                    return 100;
-//                else return -10;
-//            }
-//        }
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public enum Actions {
         KEEP_STEERING_WHEEL_STRAIGHT,
         TURN_STEERING_WHEEL,
-        TURN_STEERING_WHEEL_SHARPLY
+//        TURN_STEERING_WHEEL_SHARPLY
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public enum States {
-        STARTING_GRID,
-        LEFT_ROAD_AXIS,
-        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
-        RIGHT_ROAD_AXIS,
-        RIGHT_ROAD_AXIS_WHEEL_BLOCKING
+        CENTER_AXIS,
+        //        LEFT_ROAD_AXIS,
+//        LEFT_ROAD_AXIS_WHEEL_BLOCKING,
+//        RIGHT_ROAD_AXIS,
+//        RIGHT_ROAD_AXIS_WHEEL_BLOCKING
+        OFF_CENTER_AXIS,
+//        OFF_CENTER_AXIS_HIGH_SPEED
     }
 
 }

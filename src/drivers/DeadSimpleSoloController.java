@@ -1,4 +1,4 @@
-package drivers.tester;
+package drivers;
 
 
 import torcs.Action;
