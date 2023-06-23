@@ -1,5 +1,7 @@
 package mdp;
 
+import torcs.Constants;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -34,16 +36,16 @@ public class QLearning {
         this.system = system;
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(SteerControlVariables.Actions.values());
+                this.possibleActions = Arrays.asList(SteerControl.Actions.values());
                 this.qTablePath = STEER_Q_TABLE_PATH;
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(AccelControlVariables.Actions.values());
+                this.possibleActions = Arrays.asList(AccelControl.Actions.values());
                 this.qTablePath = ACCEL_Q_TABLE_PATH;
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(ClutchControlVariables.Actions.values());
-                this.qTablePath = CLUTCH_Q_TABLE_PATH;
+            case GEAR_CONTROL_SYSTEM -> {
+                this.possibleActions = Arrays.asList(GearControl.Actions.values());
+                this.qTablePath = GEAR_Q_TABLE_PATH;
             }
         }
         File f = new File(this.qTablePath);
@@ -57,22 +59,23 @@ public class QLearning {
         this.qTable = new HashMap<>();
         this.epsilon = INITIAL_EPSILON;
         this.maxEpochs = maxEpochs;
+        this.epsilonDecay = INITIAL_EPSILON / this.maxEpochs;
         this.epochs = 0;
 
         this.random = new Random(System.currentTimeMillis());
         this.system = system;
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(SteerControlVariables.Actions.values());
+                this.possibleActions = Arrays.asList(SteerControl.Actions.values());
                 this.qTablePath = STEER_Q_TABLE_PATH;
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(AccelControlVariables.Actions.values());
+                this.possibleActions = Arrays.asList(AccelControl.Actions.values());
                 this.qTablePath = ACCEL_Q_TABLE_PATH;
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                this.possibleActions = Arrays.asList(ClutchControlVariables.Actions.values());
-                this.qTablePath = CLUTCH_Q_TABLE_PATH;
+            case GEAR_CONTROL_SYSTEM -> {
+                this.possibleActions = Arrays.asList(GearControl.Actions.values());
+                this.qTablePath = GEAR_Q_TABLE_PATH;
             }
         }
         File f = new File(this.qTablePath);
@@ -84,30 +87,30 @@ public class QLearning {
     private void createQTable() {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                for (SteerControlVariables.States state : SteerControlVariables.States.values()) {
+                for (SteerControl.States state : SteerControl.States.values()) {
                     HashMap<String, Double> row = new HashMap<>();
                     for (Object tmp : this.possibleActions) {
-                        SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                        SteerControl.Actions action = (SteerControl.Actions) (tmp);
                         row.put(action.name(), 0.0);
                     }
                     qTable.put(state.name(), row);
                 }
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                for (AccelControlVariables.States state : AccelControlVariables.States.values()) {
+                for (AccelControl.States state : AccelControl.States.values()) {
                     HashMap<String, Double> row = new HashMap<>();
                     for (Object tmp : this.possibleActions) {
-                        AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                        AccelControl.Actions action = (AccelControl.Actions) (tmp);
                         row.put(action.name(), 0.0);
                     }
                     qTable.put(state.name(), row);
                 }
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                for (ClutchControlVariables.States state : ClutchControlVariables.States.values()) {
+            case GEAR_CONTROL_SYSTEM -> {
+                for (GearControl.States state : GearControl.States.values()) {
                     HashMap<String, Double> row = new HashMap<>();
                     for (Object tmp : this.possibleActions) {
-                        ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                        GearControl.Actions action = (GearControl.Actions) (tmp);
                         row.put(action.name(), 0.0);
                     }
                     qTable.put(state.name(), row);
@@ -146,16 +149,16 @@ public class QLearning {
             switch (this.system) {
                 case STEERING_CONTROL_SYSTEM -> {
                     for (Object tmp : this.possibleActions) {
-                        SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                        SteerControl.Actions action = (SteerControl.Actions) (tmp);
                         file.write(action.name());
                         file.write(SEPARATOR);
                     }
                     file.write("\n");
-                    for (SteerControlVariables.States state : SteerControlVariables.States.values()) {
+                    for (SteerControl.States state : SteerControl.States.values()) {
                         file.write(state.name());
                         file.write(SEPARATOR);
                         for (Object tmp : possibleActions) {
-                            SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                            SteerControl.Actions action = (SteerControl.Actions) (tmp);
                             String value = String.valueOf(this.qTable.get(state.name()).get(action.name()));
                             file.write(value);
                             file.write(SEPARATOR);
@@ -165,16 +168,16 @@ public class QLearning {
                 }
                 case ACCELERATION_CONTROL_SYSTEM -> {
                     for (Object tmp : this.possibleActions) {
-                        AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                        AccelControl.Actions action = (AccelControl.Actions) (tmp);
                         file.write(action.name());
                         file.write(SEPARATOR);
                     }
                     file.write("\n");
-                    for (AccelControlVariables.States state : AccelControlVariables.States.values()) {
+                    for (AccelControl.States state : AccelControl.States.values()) {
                         file.write(state.name());
                         file.write(SEPARATOR);
                         for (Object tmp : possibleActions) {
-                            AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                            AccelControl.Actions action = (AccelControl.Actions) (tmp);
                             String value = String.valueOf(this.qTable.get(state.name()).get(action.name()));
                             file.write(value);
                             file.write(SEPARATOR);
@@ -182,18 +185,18 @@ public class QLearning {
                         file.write("\n");
                     }
                 }
-                case CLUTCH_CONTROL_SYSTEM -> {
+                case GEAR_CONTROL_SYSTEM -> {
                     for (Object tmp : this.possibleActions) {
-                        ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                        GearControl.Actions action = (GearControl.Actions) (tmp);
                         file.write(action.name());
                         file.write(SEPARATOR);
                     }
                     file.write("\n");
-                    for (ClutchControlVariables.States state : ClutchControlVariables.States.values()) {
+                    for (GearControl.States state : GearControl.States.values()) {
                         file.write(state.name());
                         file.write(SEPARATOR);
                         for (Object tmp : possibleActions) {
-                            ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                            GearControl.Actions action = (GearControl.Actions) (tmp);
                             String value = String.valueOf(this.qTable.get(state.name()).get(action.name()));
                             file.write(value);
                             file.write(SEPARATOR);
@@ -213,7 +216,7 @@ public class QLearning {
         if (lastState != null) {
             double newQValue = this.getQValue(lastState, actionPerformed) + LEARNING_RATE * (reward + DISCOUNT_FACTOR
                     * this.getMaxQValue(lastState));
-            this.setQValue(lastState, actionPerformed, (newQValue / 10));
+            this.setQValue(lastState, actionPerformed, (Constants.round(newQValue, 8) / 10));
         }
         return nextAction(currentState);
     }
@@ -231,18 +234,18 @@ public class QLearning {
     private double getQValue(Object stateO, Object actionO) {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                SteerControlVariables.States state = (SteerControlVariables.States) (stateO);
-                SteerControlVariables.Actions action = (SteerControlVariables.Actions) (actionO);
+                SteerControl.States state = (SteerControl.States) (stateO);
+                SteerControl.Actions action = (SteerControl.Actions) (actionO);
                 return this.qTable.get(state.name()).get(action.name());
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                AccelControlVariables.States state = (AccelControlVariables.States) (stateO);
-                AccelControlVariables.Actions action = (AccelControlVariables.Actions) (actionO);
+                AccelControl.States state = (AccelControl.States) (stateO);
+                AccelControl.Actions action = (AccelControl.Actions) (actionO);
                 return this.qTable.get(state.name()).get(action.name());
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                ClutchControlVariables.States state = (ClutchControlVariables.States) (stateO);
-                ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (actionO);
+            case GEAR_CONTROL_SYSTEM -> {
+                GearControl.States state = (GearControl.States) (stateO);
+                GearControl.Actions action = (GearControl.Actions) (actionO);
                 return this.qTable.get(state.name()).get(action.name());
             }
         }
@@ -253,22 +256,22 @@ public class QLearning {
     private void setQValue(Object stateO, Object actionO, double value) {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                SteerControlVariables.States state = (SteerControlVariables.States) (stateO);
-                SteerControlVariables.Actions action = (SteerControlVariables.Actions) (actionO);
+                SteerControl.States state = (SteerControl.States) (stateO);
+                SteerControl.Actions action = (SteerControl.Actions) (actionO);
                 HashMap<String, Double> row = this.qTable.get(state.name());
                 row.replace(action.name(), value);
                 this.qTable.replace(state.name(), row);
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                AccelControlVariables.States state = (AccelControlVariables.States) (stateO);
-                AccelControlVariables.Actions action = (AccelControlVariables.Actions) (actionO);
+                AccelControl.States state = (AccelControl.States) (stateO);
+                AccelControl.Actions action = (AccelControl.Actions) (actionO);
                 HashMap<String, Double> row = this.qTable.get(state.name());
                 row.replace(action.name(), value);
                 this.qTable.replace(state.name(), row);
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                ClutchControlVariables.States state = (ClutchControlVariables.States) (stateO);
-                ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (actionO);
+            case GEAR_CONTROL_SYSTEM -> {
+                GearControl.States state = (GearControl.States) (stateO);
+                GearControl.Actions action = (GearControl.Actions) (actionO);
                 HashMap<String, Double> row = this.qTable.get(state.name());
                 row.replace(action.name(), value);
                 this.qTable.replace(state.name(), row);
@@ -280,12 +283,12 @@ public class QLearning {
     private double getMaxQValue(Object stateO) {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                SteerControlVariables.States state = (SteerControlVariables.States) (stateO);
+                SteerControl.States state = (SteerControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<SteerControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<SteerControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                    SteerControl.Actions action = (SteerControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -296,16 +299,16 @@ public class QLearning {
                     }
                 }
                 int index = random.nextInt(candidates.size());
-                SteerControlVariables.Actions selected = candidates.get(index);
+                SteerControl.Actions selected = candidates.get(index);
                 return values.get(selected.name());
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                AccelControlVariables.States state = (AccelControlVariables.States) (stateO);
+                AccelControl.States state = (AccelControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<AccelControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<AccelControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                    AccelControl.Actions action = (AccelControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -316,16 +319,16 @@ public class QLearning {
                     }
                 }
                 int index = random.nextInt(candidates.size());
-                AccelControlVariables.Actions selected = candidates.get(index);
+                AccelControl.Actions selected = candidates.get(index);
                 return values.get(selected.name());
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                ClutchControlVariables.States state = (ClutchControlVariables.States) (stateO);
+            case GEAR_CONTROL_SYSTEM -> {
+                GearControl.States state = (GearControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<ClutchControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<GearControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                    GearControl.Actions action = (GearControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -336,7 +339,7 @@ public class QLearning {
                     }
                 }
                 int index = random.nextInt(candidates.size());
-                ClutchControlVariables.Actions selected = candidates.get(index);
+                GearControl.Actions selected = candidates.get(index);
                 return values.get(selected.name());
             }
         }
@@ -363,12 +366,12 @@ public class QLearning {
     private Object getBestAction(Object stateO) {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                SteerControlVariables.States state = (SteerControlVariables.States) (stateO);
+                SteerControl.States state = (SteerControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<SteerControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<SteerControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                    SteerControl.Actions action = (SteerControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -382,12 +385,12 @@ public class QLearning {
                 return candidates.get(index);
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                AccelControlVariables.States state = (AccelControlVariables.States) (stateO);
+                AccelControl.States state = (AccelControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<AccelControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<AccelControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                    AccelControl.Actions action = (AccelControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -400,13 +403,13 @@ public class QLearning {
                 int index = random.nextInt(candidates.size());
                 return candidates.get(index);
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                ClutchControlVariables.States state = (ClutchControlVariables.States) (stateO);
+            case GEAR_CONTROL_SYSTEM -> {
+                GearControl.States state = (GearControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
-                ArrayList<ClutchControlVariables.Actions> candidates = new ArrayList<>();
+                ArrayList<GearControl.Actions> candidates = new ArrayList<>();
                 for (Object tmp : this.possibleActions) {
-                    ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                    GearControl.Actions action = (GearControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -427,12 +430,12 @@ public class QLearning {
     public Object nextOnlyBestAction(Object stateO) {
         switch (this.system) {
             case STEERING_CONTROL_SYSTEM -> {
-                SteerControlVariables.States state = (SteerControlVariables.States) (stateO);
+                SteerControl.States state = (SteerControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
                 Object theBest = this.getRandomAction();
                 for (Object tmp : this.possibleActions) {
-                    SteerControlVariables.Actions action = (SteerControlVariables.Actions) (tmp);
+                    SteerControl.Actions action = (SteerControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -442,12 +445,12 @@ public class QLearning {
                 return theBest;
             }
             case ACCELERATION_CONTROL_SYSTEM -> {
-                AccelControlVariables.States state = (AccelControlVariables.States) (stateO);
+                AccelControl.States state = (AccelControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
                 Object theBest = this.getRandomAction();
                 for (Object tmp : this.possibleActions) {
-                    AccelControlVariables.Actions action = (AccelControlVariables.Actions) (tmp);
+                    AccelControl.Actions action = (AccelControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -456,13 +459,13 @@ public class QLearning {
                 }
                 return theBest;
             }
-            case CLUTCH_CONTROL_SYSTEM -> {
-                ClutchControlVariables.States state = (ClutchControlVariables.States) (stateO);
+            case GEAR_CONTROL_SYSTEM -> {
+                GearControl.States state = (GearControl.States) (stateO);
                 double maxValue = -Double.MAX_VALUE;
                 HashMap<String, Double> values = qTable.get(state.name());
                 Object theBest = this.getRandomAction();
                 for (Object tmp : this.possibleActions) {
-                    ClutchControlVariables.Actions action = (ClutchControlVariables.Actions) (tmp);
+                    GearControl.Actions action = (GearControl.Actions) (tmp);
                     double value = values.get(action.name());
                     if (maxValue < value) {
                         maxValue = value;
@@ -477,15 +480,12 @@ public class QLearning {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public void saveStatistics(String newResults) {
-//        this.epsilon -= 0.05;
-        this.epsilon = (INITIAL_EPSILON * this.maxEpochs) / (this.maxEpochs + (this.epochs * 4.7));
         this.saveStatistics(STATISTICS_TEST_PATH, newResults);
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public void saveQTableAndStatistics(String newResults) {
         this.epochs++;
-//        this.epsilon = (INITIAL_EPSILON * this.maxEpochs) / (this.maxEpochs + (this.epochs * 4.7));
         this.saveTable();
         this.saveStatistics(STATISTICS_TRAIN_PATH, newResults);
     }
@@ -511,4 +511,7 @@ public class QLearning {
         }
     }
 
+    public void decreaseEpsilon() {
+        this.epsilon -= this.epsilonDecay;
+    }
 }

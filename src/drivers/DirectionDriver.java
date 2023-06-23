@@ -1,13 +1,12 @@
 package drivers;
 
-import mdp.AccelControl;
 import mdp.QLearning;
 import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class AutomaticTransmissionDriver extends Controller {
+public class DirectionDriver extends Controller {
 
     // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private QLearning steerControlSystem;
@@ -15,12 +14,6 @@ public class AutomaticTransmissionDriver extends Controller {
     private SteerControl.States currentSteerState;
     private SteerControl.Actions actionSteer;
     private double steerReward;
-    // QLearning to Accel Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning accelControlSystem;
-    private AccelControl.States previousAccelState;
-    private AccelControl.States currentAccelState;
-    private AccelControl.Actions actionAccel;
-    private double accelReward;
     // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private int tics;
     private int epochs;
@@ -37,18 +30,13 @@ public class AutomaticTransmissionDriver extends Controller {
     private boolean completeLap;
     private boolean offTrack;
 
-    public AutomaticTransmissionDriver() {
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    public DirectionDriver() {
         steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
         previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
         steerReward = 0;
-
-        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM);
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
-        currentAccelState = AccelControl.States.STRAIGHT_LINE;
-        actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
 
         tics = 0;
         epochs = 0;
@@ -168,11 +156,20 @@ public class AutomaticTransmissionDriver extends Controller {
         action.steering = steer;
 
         // Calculate accel/brake .......................................................................................
-        this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
-        this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
-        Double[] accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
-        action.accelerate = accel_and_brake[0];
-        action.brake = accel_and_brake[1];
+        float accel_and_brake = DrivingInstructor.getAccel(this.currentSensors);
+
+        // Set accel and brake from the joint accel/brake command
+        float accel, brake;
+        if (accel_and_brake > 0) {
+            accel = accel_and_brake;
+            brake = 0;
+        } else {
+            accel = 0;
+            // apply ABS to brake
+            brake = DrivingInstructor.filterABS(this.currentSensors, -accel_and_brake);
+        }
+        action.accelerate = accel;
+        action.brake = brake;
 
         // Calculate clutch ............................................................................................
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
@@ -189,11 +186,6 @@ public class AutomaticTransmissionDriver extends Controller {
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
         steerReward = 0;
 
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
-        currentAccelState = AccelControl.States.STRAIGHT_LINE;
-        actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
-
         if (this.completeLap) {
             this.completeLaps++;
             System.out.println("Complete lap!");
@@ -203,7 +195,7 @@ public class AutomaticTransmissionDriver extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.accelControlSystem.saveStatistics(newResults);
+        this.steerControlSystem.saveStatistics(newResults);
 
         tics = 0;
         epochs++;

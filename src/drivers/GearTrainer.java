@@ -1,26 +1,18 @@
 package drivers;
 
-import mdp.AccelControl;
+import mdp.GearControl;
 import mdp.QLearning;
-import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class AutomaticTransmissionDriver extends Controller {
-
-    // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning steerControlSystem;
-    private SteerControl.States previousSteerState;
-    private SteerControl.States currentSteerState;
-    private SteerControl.Actions actionSteer;
-    private double steerReward;
-    // QLearning to Accel Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning accelControlSystem;
-    private AccelControl.States previousAccelState;
-    private AccelControl.States currentAccelState;
-    private AccelControl.Actions actionAccel;
-    private double accelReward;
+public class GearTrainer extends Controller {
+    // QLearning to Gear Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    private QLearning gearControlSystem;
+    private GearControl.States previousGearState;
+    private GearControl.States currentGearState;
+    private GearControl.Actions actionGear;
+    private double gearReward;
     // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private int tics;
     private int epochs;
@@ -29,6 +21,7 @@ public class AutomaticTransmissionDriver extends Controller {
     private double currentDistanceFromStartLine;
     private int completeLaps;
     private double distanceRaced;
+    private double highSpeed;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
     // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -36,30 +29,30 @@ public class AutomaticTransmissionDriver extends Controller {
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
+    private boolean timeOut;
+    private long currentTimeMillis;
 
-    public AutomaticTransmissionDriver() {
-        steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
-        currentSteerState = SteerControl.States.NORMAL_SPEED;
-        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
-
-        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM);
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
-        currentAccelState = AccelControl.States.STRAIGHT_LINE;
-        actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    public GearTrainer() {
+        gearControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
+        gearReward = 0;
 
         tics = 0;
         epochs = 0;
         laps = -1;
         completeLaps = 0;
         distanceRaced = 0;
+        highSpeed = 0;
 
         stuck = 0;
         clutch = 0;
         completeLap = false;
         offTrack = false;
+        timeOut = false;
+        currentTimeMillis = System.currentTimeMillis();
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -82,14 +75,29 @@ public class AutomaticTransmissionDriver extends Controller {
 
             this.tics++;
 
+            System.out.println("Tics: " + this.tics);
             System.out.println("Laps: " + this.laps + "/1");
             System.out.println("Epochs: " + this.epochs + "/" + Constants.MAX_EPOCHS);
             System.out.println("Complete Laps: " + this.completeLaps + "/" + Constants.MAX_EPOCHS);
             System.out.println();
         }
 
+        // Check if time-out
+        if (this.currentSensors.getLastLapTime() > 240.0) {
+            this.timeOut = true;
+
+            Action action = new Action();
+            action.restartRace = true;
+            return action;
+        }
+
         // Update raced distance
         this.distanceRaced = this.currentSensors.getDistanceRaced();
+
+        // Update high speed
+        if (this.currentSensors.getSpeed() > this.highSpeed) {
+            this.highSpeed = this.currentSensors.getSpeed();
+        }
 
         // Update complete laps
         if (this.previosDistanceFromStartLine > 1 && this.currentDistanceFromStartLine < 1) {
@@ -136,7 +144,7 @@ public class AutomaticTransmissionDriver extends Controller {
                 steer = -steer;
             }
 
-            this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+            this.clutch = (double) DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
 
             // Build a CarControl variable and return it
             Action action = new Action();
@@ -149,16 +157,31 @@ public class AutomaticTransmissionDriver extends Controller {
             return action;
         }
 
+
         // If the car is not stuck .....................................................................................
         Action action = new Action();
 
-        // Calculate gear value ........................................................................................
-        action.gear = DrivingInstructor.getGear(this.currentSensors);
+        // Calculate gear value ................ .......................................................................
+        long timeTranscurred = (System.currentTimeMillis() - this.currentTimeMillis);
+        if (timeTranscurred > Constants.GRAPHIC_MODE_TIME) {
+            this.currentTimeMillis = System.currentTimeMillis();
+
+            this.previousGearState = this.currentGearState;
+            this.currentGearState = GearControl.evaluateGearState(this.currentSensors);
+            this.gearReward = GearControl.calculateReward(this.previousSensors, this.currentSensors);
+            this.actionGear = (GearControl.Actions) this.gearControlSystem.Update(
+                    this.previousGearState,
+                    this.currentGearState,
+                    this.actionGear,
+                    this.gearReward
+            );
+            action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionGear);
+        } else {
+            action.gear = GearControl.gearAction2Double(this.currentSensors, GearControl.Actions.KEEP_GEAR);
+        }
 
         // Calculate steer value .......................................................................................
-        this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
-        this.actionSteer = (SteerControl.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
-        double steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
+        float steer = DrivingInstructor.getSteer(this.currentSensors);
 
         // normalize steering
         if (steer < -1)
@@ -168,11 +191,20 @@ public class AutomaticTransmissionDriver extends Controller {
         action.steering = steer;
 
         // Calculate accel/brake .......................................................................................
-        this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
-        this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
-        Double[] accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
-        action.accelerate = accel_and_brake[0];
-        action.brake = accel_and_brake[1];
+        float accel_and_brake = DrivingInstructor.getAccel(this.currentSensors);
+
+        // Set accel and brake from the joint accel/brake command
+        float accel, brake;
+        if (accel_and_brake > 0) {
+            accel = accel_and_brake;
+            brake = 0;
+        } else {
+            accel = 0;
+            // apply ABS to brake
+            brake = DrivingInstructor.filterABS(this.currentSensors, -accel_and_brake);
+        }
+        action.accelerate = accel;
+        action.brake = brake;
 
         // Calculate clutch ............................................................................................
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
@@ -184,15 +216,14 @@ public class AutomaticTransmissionDriver extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     @Override
     public void reset() {
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
-        currentSteerState = SteerControl.States.NORMAL_SPEED;
-        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
+        gearReward = 0;
 
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
-        currentAccelState = AccelControl.States.STRAIGHT_LINE;
-        actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
+        if (this.timeOut) {
+            System.out.println("Time out!!!");
+        }
 
         if (this.completeLap) {
             this.completeLaps++;
@@ -203,18 +234,20 @@ public class AutomaticTransmissionDriver extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.accelControlSystem.saveStatistics(newResults);
+        this.gearControlSystem.saveQTableAndStatistics(newResults);
+        this.gearControlSystem.decreaseEpsilon();
 
         tics = 0;
         epochs++;
         laps = -1;
-        completeLaps = 0;
         distanceRaced = 0;
+        highSpeed = 0;
 
         stuck = 0;
         clutch = 0;
         completeLap = false;
         offTrack = false;
+        timeOut = false;
 
         System.out.println();
         System.out.println("*** Restarting the race ***");
@@ -235,6 +268,7 @@ public class AutomaticTransmissionDriver extends Controller {
                 + this.epochs + SEPARATOR
                 + this.tics + SEPARATOR
                 + (int) (this.distanceRaced) + SEPARATOR
+                + (int) (this.highSpeed) + SEPARATOR
                 + this.completeLaps + SEPARATOR
                 + Constants.MAX_EPOCHS;
     }

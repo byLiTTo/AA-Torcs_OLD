@@ -2,19 +2,11 @@ package drivers;
 
 import mdp.AccelControl;
 import mdp.QLearning;
-import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class AutomaticTransmissionDriver extends Controller {
-
-    // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning steerControlSystem;
-    private SteerControl.States previousSteerState;
-    private SteerControl.States currentSteerState;
-    private SteerControl.Actions actionSteer;
-    private double steerReward;
+public class SpeedDriver extends Controller {
     // QLearning to Accel Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private QLearning accelControlSystem;
     private AccelControl.States previousAccelState;
@@ -37,13 +29,8 @@ public class AutomaticTransmissionDriver extends Controller {
     private boolean completeLap;
     private boolean offTrack;
 
-    public AutomaticTransmissionDriver() {
-        steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
-        currentSteerState = SteerControl.States.NORMAL_SPEED;
-        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
-
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    public SpeedDriver() {
         accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM);
         previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
@@ -156,9 +143,7 @@ public class AutomaticTransmissionDriver extends Controller {
         action.gear = DrivingInstructor.getGear(this.currentSensors);
 
         // Calculate steer value .......................................................................................
-        this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
-        this.actionSteer = (SteerControl.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
-        double steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
+        float steer = DrivingInstructor.getSteer(this.currentSensors);
 
         // normalize steering
         if (steer < -1)
@@ -184,11 +169,6 @@ public class AutomaticTransmissionDriver extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     @Override
     public void reset() {
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
-        currentSteerState = SteerControl.States.NORMAL_SPEED;
-        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
-
         previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
         actionAccel = AccelControl.Actions.FULL_THROTTLE;

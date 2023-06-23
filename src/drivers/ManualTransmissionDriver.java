@@ -1,14 +1,20 @@
 package drivers;
 
 import mdp.AccelControl;
+import mdp.GearControl;
 import mdp.QLearning;
 import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class AutomaticTransmissionDriver extends Controller {
-
+public class ManualTransmissionDriver extends Controller {
+    // QLearning to Gear Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    private QLearning gearControlSystem;
+    private GearControl.States previousGearState;
+    private GearControl.States currentGearState;
+    private GearControl.Actions actionGear;
+    private double gearReward;
     // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private QLearning steerControlSystem;
     private SteerControl.States previousSteerState;
@@ -37,7 +43,14 @@ public class AutomaticTransmissionDriver extends Controller {
     private boolean completeLap;
     private boolean offTrack;
 
-    public AutomaticTransmissionDriver() {
+    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    public ManualTransmissionDriver() {
+        gearControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM);
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
+        gearReward = 0;
+
         steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
         previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
@@ -153,7 +166,9 @@ public class AutomaticTransmissionDriver extends Controller {
         Action action = new Action();
 
         // Calculate gear value ........................................................................................
-        action.gear = DrivingInstructor.getGear(this.currentSensors);
+        this.currentGearState = GearControl.evaluateGearState(this.currentSensors);
+        this.actionGear = (GearControl.Actions) this.gearControlSystem.nextOnlyBestAction(this.currentGearState);
+        action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionGear);
 
         // Calculate steer value .......................................................................................
         this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
@@ -184,6 +199,11 @@ public class AutomaticTransmissionDriver extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     @Override
     public void reset() {
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
+        gearReward = 0;
+
         previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
@@ -203,7 +223,7 @@ public class AutomaticTransmissionDriver extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.accelControlSystem.saveStatistics(newResults);
+        this.gearControlSystem.saveStatistics(newResults);
 
         tics = 0;
         epochs++;

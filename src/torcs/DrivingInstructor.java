@@ -11,8 +11,8 @@ public class DrivingInstructor {
     public static final float stuckAngle = (float) 0.523598775; //PI/6
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     /* Accel and Brake Constants */
-    public static final float maxSpeedDist = 170;
-    public static final float maxSpeed = 250;
+    public static final float maxSpeedDist = 70;
+    public static final float maxSpeed = 150;
     public static final float sin5 = (float) 0.08716;
     public static final float cos5 = (float) 0.99619;
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
