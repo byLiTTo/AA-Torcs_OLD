@@ -2,17 +2,16 @@ package drivers;
 
 import mdp.GearControl;
 import mdp.QLearning;
-import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class GearTrainer extends Controller {
-    // QLearning to Steer Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning steerControlSystem;
-    private SteerControl.States previousSteerState;
-    private SteerControl.States currentSteerState;
-    private SteerControl.Actions actionSteer;
+public class DirectionTrainer extends Controller {
+    // QLearning to Gear Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    private QLearning gearControlSystem;
+    private GearControl.States previousGearState;
+    private GearControl.States currentGearState;
+    private GearControl.Actions actionGear;
     private double gearReward;
     // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private int tics;
@@ -34,11 +33,11 @@ public class GearTrainer extends Controller {
     private long currentTimeMillis;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public GearTrainer() {
-        steerControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
-        previousSteerState = GearControl.States.NEUTRAL_REVERSE;
-        currentSteerState = GearControl.States.NEUTRAL_REVERSE;
-        actionSteer = GearControl.Actions.ACTIVE_LIMITER;
+    public DirectionTrainer() {
+        gearControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
         gearReward = 0;
 
         tics = 0;
@@ -167,16 +166,16 @@ public class GearTrainer extends Controller {
         if (timeTranscurred > Constants.GRAPHIC_MODE_TIME) {
             this.currentTimeMillis = System.currentTimeMillis();
 
-            this.previousSteerState = this.currentSteerState;
-            this.currentSteerState = GearControl.evaluateGearState(this.currentSensors);
+            this.previousGearState = this.currentGearState;
+            this.currentGearState = GearControl.evaluateGearState(this.currentSensors);
             this.gearReward = GearControl.calculateReward(this.previousSensors, this.currentSensors);
-            this.actionSteer = (GearControl.Actions) this.steerControlSystem.Update(
-                    this.previousSteerState,
-                    this.currentSteerState,
-                    this.actionSteer,
+            this.actionGear = (GearControl.Actions) this.gearControlSystem.Update(
+                    this.previousGearState,
+                    this.currentGearState,
+                    this.actionGear,
                     this.gearReward
             );
-            action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionSteer);
+            action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionGear);
         } else {
             action.gear = GearControl.gearAction2Double(this.currentSensors, GearControl.Actions.KEEP_GEAR);
         }
@@ -217,9 +216,9 @@ public class GearTrainer extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     @Override
     public void reset() {
-        previousSteerState = GearControl.States.NEUTRAL_REVERSE;
-        currentSteerState = GearControl.States.NEUTRAL_REVERSE;
-        actionSteer = GearControl.Actions.ACTIVE_LIMITER;
+        previousGearState = GearControl.States.NEUTRAL_REVERSE;
+        currentGearState = GearControl.States.NEUTRAL_REVERSE;
+        actionGear = GearControl.Actions.ACTIVE_LIMITER;
         gearReward = 0;
 
         if (this.timeOut) {
@@ -235,8 +234,8 @@ public class GearTrainer extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.steerControlSystem.saveQTableAndStatistics(newResults);
-        this.steerControlSystem.decreaseEpsilon();
+        this.gearControlSystem.saveQTableAndStatistics(newResults);
+        this.gearControlSystem.decreaseEpsilon();
 
         tics = 0;
         epochs++;
