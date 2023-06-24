@@ -30,7 +30,7 @@ public class SteerControl {
                 return (targetAngle) / steerLock;
             }
             case TURN_STEERING_WHEEL_SHARPLY -> {
-                return (float) (targetAngle / (steerLock * (current.getSpeed() - steerSensitivityOffset)
+                return (targetAngle / (steerLock * (current.getSpeed() - steerSensitivityOffset)
                         * wheelSensitivityCoeff));
             }
         }
@@ -40,7 +40,38 @@ public class SteerControl {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public static double calculateReward(SensorModel previous, SensorModel current) {
-        return 0;
+        double reward = 0.0;
+
+        // Reward for staying on the track
+        if (Math.abs(current.getTrackPosition()) <= 1.0) {
+            reward += 10.0;
+        } else {
+            reward -= 10.0;
+        }
+
+        // Reward for maintaining a good speed
+        if (current.getSpeed() > 50.0) {
+            reward += 10.0;
+        } else {
+            reward -= 10.0;
+        }
+
+        // Reward for good track angle (the vehicle is aligned with the track axis)
+        if (Math.abs(current.getAngleToTrackAxis()) < 0.1) {
+            reward += 10.0;
+        } else {
+            reward -= 100.0;
+        }
+
+        // Reward for maintaining a stable acceleration
+        double acceleration = current.getSpeed() - previous.getSpeed();
+        if (Math.abs(acceleration) < 5.0) {
+            reward += 10.0;
+        } else {
+            reward -= 10.0;
+        }
+
+        return reward;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->

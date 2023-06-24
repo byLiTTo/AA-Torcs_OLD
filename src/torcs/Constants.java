@@ -8,8 +8,8 @@ public class Constants {
     public static final double INITIAL_EPSILON = 1.0;
     public static final double LEARNING_RATE = 0.2;
     public static final double DISCOUNT_FACTOR = 0.5;
-    public static final int MAX_EPOCHS = 1000;
-    public static final int RANGE_EPOCHS = 800;
+    public static final int MAX_EPOCHS = 10;
+    public static final int RANGE_EPOCHS = 5;
     public static final int GRAPHIC_MODE_TIME = 50;
     public static final double CONSOLE_MODE_TIME = 0.0000001;
     public static final String STEER_Q_TABLE_PATH = System.getProperty("user.dir") + "/mdp/resources/QTable_Steer.csv";

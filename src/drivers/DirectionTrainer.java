@@ -2,17 +2,18 @@ package drivers;
 
 import mdp.GearControl;
 import mdp.QLearning;
+import mdp.SteerControl;
 import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
 public class DirectionTrainer extends Controller {
-    // QLearning to Gear Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private QLearning gearControlSystem;
-    private GearControl.States previousGearState;
-    private GearControl.States currentGearState;
-    private GearControl.Actions actionGear;
-    private double gearReward;
+    // QLearning to Steer Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    private QLearning steerControlSystem;
+    private SteerControl.States previousSteerState;
+    private SteerControl.States currentSteerState;
+    private SteerControl.Actions actionSteer;
+    private double steerReward;
     // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private int tics;
     private int epochs;
@@ -34,11 +35,11 @@ public class DirectionTrainer extends Controller {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public DirectionTrainer() {
-        gearControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
-        previousGearState = GearControl.States.NEUTRAL_REVERSE;
-        currentGearState = GearControl.States.NEUTRAL_REVERSE;
-        actionGear = GearControl.Actions.ACTIVE_LIMITER;
-        gearReward = 0;
+        steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
+        previousSteerState = SteerControl.States.NORMAL_SPEED;
+        currentSteerState = SteerControl.States.NORMAL_SPEED;
+        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
+        steerReward = 0;
 
         tics = 0;
         epochs = 0;
@@ -162,32 +163,31 @@ public class DirectionTrainer extends Controller {
         Action action = new Action();
 
         // Calculate gear value ................ .......................................................................
+        action.gear = DrivingInstructor.getGear(this.currentSensors);
+
+        // Calculate steer value .......................................................................................
+        double steer;
+
         long timeTranscurred = (System.currentTimeMillis() - this.currentTimeMillis);
         if (timeTranscurred > Constants.GRAPHIC_MODE_TIME) {
             this.currentTimeMillis = System.currentTimeMillis();
-
-            this.previousGearState = this.currentGearState;
-            this.currentGearState = GearControl.evaluateGearState(this.currentSensors);
-            this.gearReward = GearControl.calculateReward(this.previousSensors, this.currentSensors);
-            this.actionGear = (GearControl.Actions) this.gearControlSystem.Update(
-                    this.previousGearState,
-                    this.currentGearState,
-                    this.actionGear,
-                    this.gearReward
+            this.previousSteerState = this.currentSteerState;
+            this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
+            this.steerReward = SteerControl.calculateReward(this.previousSensors, this.currentSensors);
+            this.actionSteer = (SteerControl.Actions) this.steerControlSystem.Update(
+                    this.previousSteerState,
+                    this.currentSteerState,
+                    this.actionSteer,
+                    this.steerReward
             );
-            action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionGear);
+            steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
         } else {
-            action.gear = GearControl.gearAction2Double(this.currentSensors, GearControl.Actions.KEEP_GEAR);
+            steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
         }
 
-        // Calculate steer value .......................................................................................
-        float steer = DrivingInstructor.getSteer(this.currentSensors);
-
         // normalize steering
-        if (steer < -1)
-            steer = -1;
-        if (steer > 1)
-            steer = 1;
+        if (steer < -1) steer = -1;
+        if (steer > 1) steer = 1;
         action.steering = steer;
 
         // Calculate accel/brake .......................................................................................
@@ -216,10 +216,10 @@ public class DirectionTrainer extends Controller {
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     @Override
     public void reset() {
-        previousGearState = GearControl.States.NEUTRAL_REVERSE;
-        currentGearState = GearControl.States.NEUTRAL_REVERSE;
-        actionGear = GearControl.Actions.ACTIVE_LIMITER;
-        gearReward = 0;
+        previousSteerState = SteerControl.States.NORMAL_SPEED;
+        currentSteerState = SteerControl.States.NORMAL_SPEED;
+        actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
+        steerReward = 0;
 
         if (this.timeOut) {
             System.out.println("Time out!!!");
@@ -234,8 +234,8 @@ public class DirectionTrainer extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.gearControlSystem.saveQTableAndStatistics(newResults);
-        this.gearControlSystem.decreaseEpsilon();
+        this.steerControlSystem.saveQTableAndStatistics(newResults);
+        this.steerControlSystem.decreaseEpsilon();
 
         tics = 0;
         epochs++;
@@ -264,12 +264,6 @@ public class DirectionTrainer extends Controller {
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private String generateStatistics() {
-        return getTrackName() + SEPARATOR
-                + this.epochs + SEPARATOR
-                + this.tics + SEPARATOR
-                + (int) (this.distanceRaced) + SEPARATOR
-                + (int) (this.highSpeed) + SEPARATOR
-                + this.completeLaps + SEPARATOR
-                + Constants.MAX_EPOCHS;
+        return getTrackName() + SEPARATOR + this.epochs + SEPARATOR + this.tics + SEPARATOR + (int) (this.distanceRaced) + SEPARATOR + (int) (this.highSpeed) + SEPARATOR + this.completeLaps + SEPARATOR + Constants.MAX_EPOCHS;
     }
 }
