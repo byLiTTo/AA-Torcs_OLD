@@ -6,15 +6,14 @@ import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
-public class SpeedDriver extends Controller {
-    // QLearning to Accel Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+public class SpeedTrainer extends Controller {
+    // QLearning to Steer Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private QLearning accelControlSystem;
     private AccelControl.States previousAccelState;
     private AccelControl.States currentAccelState;
     private AccelControl.Actions actionAccel;
     private double accelReward;
-    private Double[] previousAccelBrake;
-    private Double[] currentAccelBrake;
+    private Double[] accel_and_brake;
     // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     private int tics;
     private int epochs;
@@ -23,6 +22,7 @@ public class SpeedDriver extends Controller {
     private double currentDistanceFromStartLine;
     private int completeLaps;
     private double distanceRaced;
+    private double highSpeed;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
     // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -30,27 +30,31 @@ public class SpeedDriver extends Controller {
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
+    private boolean timeOut;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public SpeedDriver() {
-        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM);
+    public SpeedTrainer() {
+        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM,
+                Constants.RANGE_EPOCHS
+        );
         previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
         actionAccel = AccelControl.Actions.FULL_THROTTLE;
         accelReward = 0;
-        previousAccelBrake = new Double[2];
-        currentAccelBrake = new Double[2];
+        accel_and_brake = new Double[2];
 
         tics = 0;
         epochs = 0;
         laps = -1;
         completeLaps = 0;
         distanceRaced = 0;
+        highSpeed = 0;
 
         stuck = 0;
         clutch = 0;
         completeLap = false;
         offTrack = false;
+        timeOut = false;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -63,6 +67,8 @@ public class SpeedDriver extends Controller {
             this.previousSensors = sensors;
             this.currentSensors = this.previousSensors;
 
+            accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
+
             this.tics++;
         } else {
             this.previosDistanceFromStartLine = this.currentDistanceFromStartLine;
@@ -73,14 +79,29 @@ public class SpeedDriver extends Controller {
 
             this.tics++;
 
+            System.out.println("Tics: " + this.tics);
             System.out.println("Laps: " + this.laps + "/1");
             System.out.println("Epochs: " + this.epochs + "/" + Constants.MAX_EPOCHS);
             System.out.println("Complete Laps: " + this.completeLaps + "/" + Constants.MAX_EPOCHS);
             System.out.println();
         }
 
+        // Check if time-out
+        if (this.currentSensors.getCurrentLapTime() > 240.0) {
+            this.timeOut = true;
+
+            Action action = new Action();
+            action.restartRace = true;
+            return action;
+        }
+
         // Update raced distance
         this.distanceRaced = this.currentSensors.getDistanceRaced();
+
+        // Update high speed
+        if (this.currentSensors.getSpeed() > this.highSpeed) {
+            this.highSpeed = this.currentSensors.getSpeed();
+        }
 
         // Update complete laps
         if (this.previosDistanceFromStartLine > 1 && this.currentDistanceFromStartLine < 1) {
@@ -127,7 +148,7 @@ public class SpeedDriver extends Controller {
                 steer = -steer;
             }
 
-            this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+            this.clutch = (double) DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
 
             // Build a CarControl variable and return it
             Action action = new Action();
@@ -140,10 +161,11 @@ public class SpeedDriver extends Controller {
             return action;
         }
 
+
         // If the car is not stuck .....................................................................................
         Action action = new Action();
 
-        // Calculate gear value ........................................................................................
+        // Calculate gear value ................ .......................................................................
         action.gear = DrivingInstructor.getGear(this.currentSensors);
 
         // Calculate steer value .......................................................................................
@@ -157,12 +179,35 @@ public class SpeedDriver extends Controller {
         action.steering = steer;
 
         // Calculate accel/brake .......................................................................................
-        this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
-        AccelControl.Actions temp = this.actionAccel;
-        this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
-        Double[] accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
-        action.accelerate = accel_and_brake[0];
-        action.brake = accel_and_brake[1];
+        if (this.tics % 20 == 0) {
+            this.previousAccelState = this.currentAccelState;
+            this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
+            this.accelReward = AccelControl.calculateReward(this.previousSensors, this.currentSensors);
+            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.Update(
+                    this.previousAccelState,
+                    this.currentAccelState,
+                    this.actionAccel,
+                    this.accelReward
+            );
+            this.accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
+            action.accelerate = this.accel_and_brake[0];
+            action.brake = this.accel_and_brake[1];
+
+//            System.out.println("State P: " + this.previousAccelState.name());
+//            System.out.println("State C: " + this.currentAccelState.name());
+//            System.out.println("Vel P: " + this.previousSensors.getSpeed());
+//            System.out.println("Vel C: " + this.currentSensors.getSpeed());
+//            System.out.println("Action: " + this.actionAccel);
+//            System.out.println();
+
+        } else {
+            this.previousAccelState = this.currentAccelState;
+            this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
+            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
+            this.accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
+            action.accelerate = this.accel_and_brake[0];
+            action.brake = this.accel_and_brake[1];
+        }
 
         // Calculate clutch ............................................................................................
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
@@ -179,6 +224,10 @@ public class SpeedDriver extends Controller {
         actionAccel = AccelControl.Actions.FULL_THROTTLE;
         accelReward = 0;
 
+        if (this.timeOut) {
+            System.out.println("Time out!!!");
+        }
+
         if (this.completeLap) {
             this.completeLaps++;
             System.out.println("Complete lap!");
@@ -188,18 +237,20 @@ public class SpeedDriver extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.accelControlSystem.saveStatistics(newResults);
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
+        this.accelControlSystem.decreaseEpsilon();
 
         tics = 0;
         epochs++;
         laps = -1;
-        completeLaps = 0;
         distanceRaced = 0;
+        highSpeed = 0;
 
         stuck = 0;
         clutch = 0;
         completeLap = false;
         offTrack = false;
+        timeOut = false;
 
         System.out.println();
         System.out.println("*** Restarting the race ***");
@@ -220,6 +271,7 @@ public class SpeedDriver extends Controller {
                 + this.epochs + SEPARATOR
                 + this.tics + SEPARATOR
                 + (int) (this.distanceRaced) + SEPARATOR
+                + (int) (this.highSpeed) + SEPARATOR
                 + this.completeLaps + SEPARATOR
                 + Constants.MAX_EPOCHS;
     }
