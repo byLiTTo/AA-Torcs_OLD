@@ -4,29 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4fa1b8f8-647d-448f-a7b9-d72a37a6f4f6" name="Changes" comment="- Evaluacion de estado de dirección de volante&#10;- Ejecucion de accion de dirección de volante&#10;- Funcion recompensa (beta) de dirección de volante">
-      <change afterPath="$PROJECT_DIR$/src/drivers/SpeedTrainer.java" afterDir="false" />
+    <list default="true" id="4fa1b8f8-647d-448f-a7b9-d72a37a6f4f6" name="Changes" comment="calculateRewardV1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/AutomaticTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/AutomaticTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/DirectionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/DirectionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/DirectionTrainer.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/DirectionTrainer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/GearDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/GearDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/GearTrainer.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/GearTrainer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/ManualTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/ManualTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/SpeedDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/SpeedDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl$Actions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl$States.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/QLearning.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/QLearning.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTest.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTest.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/torcs/Constants$ControlSystems.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/torcs/Constants$ControlSystems.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/torcs/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/torcs/Constants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/DirectionTrainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/DirectionTrainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/GearTrainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/GearTrainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drivers/SpeedDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/SpeedDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/AccelControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/AccelControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torcs/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Constants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +89,7 @@
       <workItem from="1687541774313" duration="17000" />
       <workItem from="1687541798104" duration="3744000" />
       <workItem from="1687601302636" duration="29029000" />
-      <workItem from="1687685333410" duration="603000" />
+      <workItem from="1687685333410" duration="2766000" />
     </task>
     <task id="LOCAL-00003" summary="- Evaluacion de estado de dirección de volante&#10;- Ejecucion de accion de dirección de volante&#10;- Funcion recompensa (beta) de dirección de volante">
       <option name="closed" value="true" />
@@ -119,7 +99,15 @@
       <option name="project" value="LOCAL" />
       <updated>1687616210822</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="calculateRewardV1">
+      <option name="closed" value="true" />
+      <created>1687688499908</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1687688499908</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,7 +128,8 @@
     <MESSAGE value="Volvemos a la formula inicial" />
     <MESSAGE value="- Evaluacion de estado de cambio de marchas&#10;- Ejecucion de accion de cambio de marchas&#10;- Funcion recompensa de cambio de marchas" />
     <MESSAGE value="- Evaluacion de estado de dirección de volante&#10;- Ejecucion de accion de dirección de volante&#10;- Funcion recompensa (beta) de dirección de volante" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Evaluacion de estado de dirección de volante&#10;- Ejecucion de accion de dirección de volante&#10;- Funcion recompensa (beta) de dirección de volante" />
+    <MESSAGE value="calculateRewardV1" />
+    <option name="LAST_COMMIT_MESSAGE" value="calculateRewardV1" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

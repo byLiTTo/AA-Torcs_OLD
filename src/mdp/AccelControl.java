@@ -182,130 +182,107 @@ public class AccelControl {
                 switch (previousState) {
 
                     case STRAIGHT_LINE -> {
-                        switch (currentState) {
+                        if (currentState == States.STRAIGHT_LINE) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
+                                else return -100.0;
+                            }
+                        }
 
-                            case STRAIGHT_LINE -> {
-                                if (previous.getSpeed() < current.getSpeed() || current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ACCEL -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                                if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
+                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            else return -100.0;
                         }
                     }
                     case IN_CURVE_SHOULD_ACCEL -> {
-                        switch (currentState) {
+                        if (currentState == States.STRAIGHT_LINE) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
+                                else return -100.0;
+                            }
+                        }
+                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
+                                else return -100.0;
+                            }
+                        }
 
-                            case STRAIGHT_LINE -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ACCEL -> {
-                                if (previous.getSpeed() < current.getSpeed()
-                                        || (int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                                if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
+                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            else return -100.0;
                         }
                     }
                     case IN_CURVE_SHOULD_BRAKE -> {
-                        switch (currentState) {
+                        if (currentState == States.STRAIGHT_LINE) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
+                                else return -100.0;
+                            }
+                        }
+                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
+                                else return -100.0;
+                            }
+                        }
 
-                            case STRAIGHT_LINE -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                        if (currentState == States.IN_CURVE_SHOULD_BRAKE) {
+                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
                                 else return -100.0;
                             }
-                            case IN_CURVE_SHOULD_ACCEL -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()
-                                        || (int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                                if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
+                        }
+
+                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            else return -100.0;
                         }
                     }
                     case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                        switch (currentState) {
-
-                            case STRAIGHT_LINE -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ACCEL -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                                if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
+                        if (currentState == States.STRAIGHT_LINE) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
                                 else return -100.0;
                             }
                         }
+                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
+                                else return -100.0;
+                            }
+                        }
+                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            else return -100.0;
+                        }
                     }
                     case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                        switch (currentState) {
+                        if (currentState == States.STRAIGHT_LINE) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else {
+                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
+                                else return -100.0;
+                            }
+                        }
+                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
+                            else return -100.0;
 
-                            case STRAIGHT_LINE -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ACCEL -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_BRAKE -> {
-                                if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                                if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                            case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                                if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
+                        }
+
+                        if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+                            if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
+                            else return -100.0;
+
                         }
                     }
                 }
