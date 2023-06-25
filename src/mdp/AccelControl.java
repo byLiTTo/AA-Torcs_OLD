@@ -261,7 +261,8 @@ public class AccelControl {
                             }
                         }
                         if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
+                            if (previous.getSpeed() > current.getSpeed() || (int) previous.getSpeed() == (int) current.getSpeed())
+                                return 100.0;
                             else return -100.0;
                         }
                     }
@@ -280,7 +281,8 @@ public class AccelControl {
                         }
 
                         if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                            if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
+                            if (previous.getSpeed() > current.getSpeed() || (int) previous.getSpeed() == (int) current.getSpeed())
+                                return 100.0;
                             else return -100.0;
 
                         }
