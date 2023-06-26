@@ -11,10 +11,10 @@ public class AccelControl {
     private static final double cos5 = (float) 0.99619;
     private static final double maxSpeed = 150;
     // ABS Variables --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    private static final float absMinSpeed = (float) 3.0;
-    private static final float wheelRadius[] = {(float) 0.3179, (float) 0.3179, (float) 0.3276, (float) 0.3276};
-    private static final float absSlip = (float) 2.0;
-    private static final float absRange = (float) 3.0;
+    private static final double absMinSpeed = 3.0;
+    private static final double[] wheelRadius = {0.3179, 0.3179, 0.3276, 0.3276};
+    private static final double absSlip = 2.0;
+    private static final double absRange = 3.0;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public static States evaluateAccelState(SensorModel current) {
@@ -58,19 +58,19 @@ public class AccelControl {
                 double brake = -accel_and_brake;
 
                 // convert speed to m/s
-                float speed = (float) (current.getSpeed() / 3.6);
+                double speed = (current.getSpeed() / 3.6);
 
                 // when speed lower than min speed for abs do nothing
                 if (speed < absMinSpeed) {
                     return States.IN_CURVE_SHOULD_BRAKE;
                 } else {
                     // compute the speed of wheels in m/s
-                    float slip = 0.0f;
+                    double slip = 0.0;
                     for (int i = 0; i < 4; i++) {
                         slip += current.getWheelSpinVelocity()[i] * wheelRadius[i];
                     }
                     // slip is the difference between actual speed of car and average speed of wheels
-                    slip = speed - slip / 4.0f;
+                    slip = speed - slip / 4.0;
                     // when slip too high applu ABS
                     if (slip > absSlip) {
                         brake = brake - (slip - absSlip) / absRange;
@@ -169,128 +169,119 @@ public class AccelControl {
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
-    public static double calculateReward(SensorModel previous, SensorModel current) {
-        if (previous == null) {
+    public static double calculateReward(SensorModel previous, SensorModel current, double previousAccel, double currentAccel) {
+        if (previous == null || current.getCurrentLapTime() <= 0.018) {
             return 0.0;
         } else {
-            if (Math.abs(previous.getTrackPosition()) < 1 && Math.abs(current.getTrackPosition()) >= 1) {
-                return -1000.0;
-            } else {
-                States previousState = evaluateAccelState(previous);
-                States currentState = evaluateAccelState(current);
+            if (previous.getDistanceRaced() == current.getDistanceRaced()) return -100.0;
 
-                switch (previousState) {
 
-                    case STRAIGHT_LINE -> {
-                        if (currentState == States.STRAIGHT_LINE) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                        }
+            States previousState = evaluateAccelState(previous);
+            States currentState = evaluateAccelState(current);
 
-                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                            else return -100.0;
-                        }
-                    }
-                    case IN_CURVE_SHOULD_ACCEL -> {
-                        if (currentState == States.STRAIGHT_LINE) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                        }
+            previousAccel = Constants.round(previousAccel, 3);
+            currentAccel = Constants.round(currentAccel, 3);
 
-                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                            else return -100.0;
-                        }
-                    }
-                    case IN_CURVE_SHOULD_BRAKE -> {
-                        if (currentState == States.STRAIGHT_LINE) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-
-                        if (currentState == States.IN_CURVE_SHOULD_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-
-                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed()) return 100.0;
-                            else return -100.0;
-                        }
-                    }
-                    case IN_CURVE_SHOULD_HAND_BRAKE -> {
-                        if (currentState == States.STRAIGHT_LINE) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() == current.getSpeed()) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-                        if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                            if (previous.getSpeed() > current.getSpeed() || (int) previous.getSpeed() == (int) current.getSpeed())
-                                return 100.0;
-                            else return -100.0;
-                        }
-                    }
-                    case IN_CURVE_SHOULD_ALLOW_ROLL -> {
-                        if (currentState == States.STRAIGHT_LINE) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else {
-                                if (previous.getSpeed() >= 149 && current.getSpeed() >= 149) return 100.0;
-                                else return -100.0;
-                            }
-                        }
-                        if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
-                            if (previous.getSpeed() < current.getSpeed()) return 100.0;
-                            else return -100.0;
-
-                        }
-
-                        if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                            if (previous.getSpeed() > current.getSpeed() || (int) previous.getSpeed() == (int) current.getSpeed())
-                                return 100.0;
-                            else return -100.0;
-
-                        }
+            // .........................................................................................................
+            if (previousState == States.STRAIGHT_LINE) {
+                if (currentState == States.STRAIGHT_LINE) {
+                    if (previous.getSpeed() < current.getSpeed()) {
+                        if (previousAccel < currentAccel) return 200.0;
+                        else return 100.0;
+                    } else {
+                        if (previous.getGear() < current.getGear()) return 100.0;
+                        else return -100.0;
                     }
                 }
+                if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                    if (previous.getSpeed() < current.getSpeed()) {
+                        if (previousAccel <= currentAccel) return 200.0;
+                        else return 100.0;
+                    } else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel > currentAccel) return 100.0;
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    if ((int) previous.getSpeed() == (int) current.getSpeed() && previousAccel < currentAccel)
+                        return 100.0;
+                    else return -100.0;
+                }
+
+//                if (previous.getSpeed() > current.getSpeed()) return -100.0;
+//                return -10.0;
+                return -100.0;
+            }
+
+            // .........................................................................................................
+            if (previousState == States.IN_CURVE_SHOULD_ACCEL) {
+                if (currentState == States.STRAIGHT_LINE) {
+                    if (previous.getSpeed() < current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    else if ((int) previous.getSpeed() == (int) current.getSpeed()) return 100.0;
+                    else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                    if (previous.getSpeed() < current.getSpeed() && previousAccel >= currentAccel) return 100.0;
+                    else return -100.0;
+                }
+//                    if (previous.getSpeed() > current.getSpeed()) return -100.0;
+//                    return -10.0;
+                return -100.0;
+            }
+
+            // .........................................................................................................
+            if (previousState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel > currentAccel) return 100.0;
+                    else if (previous.getSpeed() < current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < 0 && currentAccel < 0)
+                        return 100.0;
+                    else if (previous.getSpeed() < current.getSpeed() && previousAccel > currentAccel) return 100.0;
+                    else if (previous.getSpeed() == current.getSpeed() && previousAccel < currentAccel)
+                        return 100.0;
+                    else return -100.0;
+
+                }
+                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel > currentAccel) return 100.0;
+                    else return -100.0;
+                }
+
+//                if (previous.getSpeed() < current.getSpeed()) return -100.0;
+//                return -10.0;
+                return -100.0;
+            }
+
+            // .........................................................................................................
+            if (previousState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+                if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < 0 && currentAccel < 0)
+                        return 100.0;
+                    else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    else return -100.0;
+                }
+                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+                    if (previous.getSpeed() > current.getSpeed() && previousAccel < currentAccel) return 100.0;
+                    else if (previous.getSpeed() > current.getSpeed() && previousAccel < 0 && currentAccel < 0)
+                        return 100.0;
+                    else return -100.0;
+                }
+
+//                if (previous.getSpeed() < current.getSpeed()) return -100.0;
+//                return -10.0;
+                return -100.0;
             }
         }
-        return 0.0;
+        return -10.0;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
