@@ -64,21 +64,21 @@ public class AccelControl {
 //                if (speed < absMinSpeed) {
 //                    return States.IN_CURVE_SHOULD_BRAKE;
 //                } else {
-                    // compute the speed of wheels in m/s
-                    double slip = 0.0;
-                    for (int i = 0; i < 4; i++) {
-                        slip += current.getWheelSpinVelocity()[i] * wheelRadius[i];
-                    }
-                    // slip is the difference between actual speed of car and average speed of wheels
-                    slip = speed - slip / 4.0;
-                    // when slip too high applu ABS
-                    if (slip > absSlip) {
-                        brake = brake - (slip - absSlip) / absRange;
-                    }
+                // compute the speed of wheels in m/s
+                double slip = 0.0;
+                for (int i = 0; i < 4; i++) {
+                    slip += current.getWheelSpinVelocity()[i] * wheelRadius[i];
+                }
+                // slip is the difference between actual speed of car and average speed of wheels
+                slip = speed - slip / 4.0;
+                // when slip too high applu ABS
+                if (slip > absSlip) {
+                    brake = brake - (slip - absSlip) / absRange;
+                }
 
-                    // check brake is not negative, otherwise set it to zero
-                    if (brake >= 0) return States.IN_CURVE_SHOULD_HAND_BRAKE;
-                    else return States.IN_CURVE_SHOULD_ALLOW_ROLL;
+                // check brake is not negative, otherwise set it to zero
+                if (brake >= 0) return States.IN_CURVE_SHOULD_HAND_BRAKE;
+                else return States.IN_CURVE_SHOULD_ALLOW_ROLL;
 //                }
             }
         }
@@ -140,29 +140,29 @@ public class AccelControl {
 //                    result[1] = Constants.round(brake, 8);
 //                    return result;
 //                } else {
-                    // compute the speed of wheels in m/s
-                    float slip = 0.0f;
-                    for (int i = 0; i < 4; i++) {
-                        slip += current.getWheelSpinVelocity()[i] * wheelRadius[i];
-                    }
-                    // slip is the difference between actual speed of car and average speed of wheels
-                    slip = speed - slip / 4.0f;
-                    // when slip too high applu ABS
-                    if (slip > absSlip) {
-                        brake = brake - (slip - absSlip) / absRange;
-                    }
+                // compute the speed of wheels in m/s
+                float slip = 0.0f;
+                for (int i = 0; i < 4; i++) {
+                    slip += current.getWheelSpinVelocity()[i] * wheelRadius[i];
+                }
+                // slip is the difference between actual speed of car and average speed of wheels
+                slip = speed - slip / 4.0f;
+                // when slip too high applu ABS
+                if (slip > absSlip) {
+                    brake = brake - (slip - absSlip) / absRange;
+                }
 
-                    // check brake is not negative, otherwise set it to zero
-                    if (action == Actions.HANDBRAKE) {
-                        result[0] = 0.0;
-                        result[1] = Constants.round(brake, 8);
-                        return result;
-                    } else {
-                        // if action == Actions.KEEP_ROLLING
-                        result[0] = 0.0;
-                        result[1] = 0.0;
-                        return result;
-                    }
+                // check brake is not negative, otherwise set it to zero
+                if (action == Actions.HANDBRAKE) {
+                    result[0] = 0.0;
+                    result[1] = Constants.round(brake, 8);
+                    return result;
+                } else {
+                    // if action == Actions.KEEP_ROLLING
+                    result[0] = 0.0;
+                    result[1] = 0.0;
+                    return result;
+                }
 //                }
             }
         }
@@ -202,9 +202,10 @@ public class AccelControl {
                         else return 100.0;
                     } else return -100.0;
                 }
-                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                    return -100.0;
-                }
+                if (previous.getSpeed() > current.getSpeed()) return -100.0;
+//                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+//                    return -100.0;
+//                }
             }
 
             // .........................................................................................................
@@ -230,9 +231,10 @@ public class AccelControl {
                     if (previous.getSpeed() > current.getSpeed()) return 100.0;
                     else return -100.0;
                 }
-                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                    return -100.0;
-                }
+                if (previous.getSpeed() > current.getSpeed()) return -100.0;
+//                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+//                    return -100.0;
+//                }
             }
             // .........................................................................................................
 //            if (previousState == States.IN_CURVE_SHOULD_BRAKE) {
@@ -241,9 +243,9 @@ public class AccelControl {
 
             // .........................................................................................................
             if (previousState == States.IN_CURVE_SHOULD_HAND_BRAKE) {
-                if (currentState == States.STRAIGHT_LINE) {
-                    return -100.0;
-                }
+//                if (currentState == States.STRAIGHT_LINE) {
+//                    return -100.0;
+//                }
                 if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
                     if (previous.getSpeed() > current.getSpeed()) return 100.0;
                     else return -100.0;
@@ -257,16 +259,17 @@ public class AccelControl {
 //                    else if (previous.getSpeed() < current.getSpeed() && previousAccel > currentAccel) return 50.0;
                     else return -100.0;
                 }
-                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                    return -100.0;
-                }
+//                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+//                    return -100.0;
+//                }
+                if (previous.getSpeed() < current.getSpeed()) return -100.0;
             }
 
             // .........................................................................................................
             if (previousState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                if (currentState == States.STRAIGHT_LINE) {
-                    return -100.0;
-                }
+//                if (currentState == States.STRAIGHT_LINE) {
+//                    return -100.0;
+//                }
                 if (currentState == States.IN_CURVE_SHOULD_ACCEL) {
                     if (previous.getSpeed() > current.getSpeed() && previousAccel > currentAccel) return 200.0;
                     if (previous.getSpeed() > current.getSpeed() && previousAccel < currentAccel) return 100.0;
@@ -279,9 +282,10 @@ public class AccelControl {
                     if (previous.getSpeed() > current.getSpeed() && previousAccel > currentAccel) return 100.0;
                     else return -100.0;
                 }
-                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
-                    return -100.0;
-                }
+//                if (currentState == States.IN_CURVE_SHOULD_ALLOW_ROLL) {
+//                    return -100.0;
+//                }
+                if (previous.getSpeed() < current.getSpeed()) return -100.0;
             }
         }
         return -10.0;
@@ -291,7 +295,7 @@ public class AccelControl {
     public enum Actions {
         FULL_THROTTLE,
         ACCELERATE,
-//        BRAKE,
+        //        BRAKE,
         HANDBRAKE,
         KEEP_ROLLING,
     }
@@ -300,7 +304,7 @@ public class AccelControl {
     public enum States {
         STRAIGHT_LINE,
         IN_CURVE_SHOULD_ACCEL,
-//        IN_CURVE_SHOULD_BRAKE,
+        //        IN_CURVE_SHOULD_BRAKE,
         IN_CURVE_SHOULD_HAND_BRAKE,
         IN_CURVE_SHOULD_ALLOW_ROLL
     }

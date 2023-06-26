@@ -226,7 +226,7 @@ public class QLearning {
         if (this.lastState != null) {
             double newQValue = (1 - LEARNING_RATE) * this.getQValue(this.lastState, lastAction) + LEARNING_RATE
                     * (reward + DISCOUNT_FACTOR * this.getMaxQValue(this.lastState));
-            this.setQValue(this.lastState, lastAction, newQValue);
+            this.setQValue(this.lastState, lastAction, (Constants.round(newQValue, 8) / 10));
         }
     }
 

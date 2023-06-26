@@ -31,6 +31,7 @@ public class SpeedTrainer extends Controller {
     private boolean completeLap;
     private boolean offTrack;
     private boolean timeOut;
+    private double accel;
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
     public SpeedTrainer() {
@@ -55,6 +56,7 @@ public class SpeedTrainer extends Controller {
         completeLap = false;
         offTrack = false;
         timeOut = false;
+        accel = 0.0;
     }
 
     //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
@@ -74,8 +76,6 @@ public class SpeedTrainer extends Controller {
             this.previosDistanceFromStartLine = this.currentDistanceFromStartLine;
             this.currentDistanceFromStartLine = sensors.getDistanceFromStartLine();
 
-            this.previousSensors = this.currentSensors;
-            this.currentSensors = sensors;
 
             this.tics++;
 
@@ -87,7 +87,7 @@ public class SpeedTrainer extends Controller {
         }
 
         // Check if time-out
-        if (this.currentSensors.getCurrentLapTime() > 240.0) {
+        if (sensors.getCurrentLapTime() > 240.0) {
             this.timeOut = true;
 
             Action action = new Action();
@@ -96,11 +96,11 @@ public class SpeedTrainer extends Controller {
         }
 
         // Update raced distance
-        this.distanceRaced = this.currentSensors.getDistanceRaced();
+        this.distanceRaced = sensors.getDistanceRaced();
 
         // Update high speed
-        if (this.currentSensors.getSpeed() > this.highSpeed) {
-            this.highSpeed = this.currentSensors.getSpeed();
+        if (sensors.getSpeed() > this.highSpeed) {
+            this.highSpeed = sensors.getSpeed();
         }
 
         // Update complete laps
@@ -119,8 +119,10 @@ public class SpeedTrainer extends Controller {
         }
 
         // If the car is off track, restart the race
-        if (Math.abs(this.currentSensors.getTrackPosition()) >= 1) {
+        if (Math.abs(sensors.getTrackPosition()) >= 1) {
             this.offTrack = true;
+
+            this.accelControlSystem.lastUpdate(this.actionAccel, -1000.0);
 
             Action action = new Action();
             action.restartRace = true;
@@ -128,7 +130,7 @@ public class SpeedTrainer extends Controller {
         }
 
         // check if car is currently stuck
-        if (Math.abs(this.currentSensors.getAngleToTrackAxis()) > DrivingInstructor.stuckAngle) {
+        if (Math.abs(sensors.getAngleToTrackAxis()) > DrivingInstructor.stuckAngle) {
             this.stuck++;
         } else {
             this.stuck = 0;
@@ -139,16 +141,16 @@ public class SpeedTrainer extends Controller {
             // Set gear and steering command assuming car is pointing in a direction out of track
 
             // To bring car parallel to track axis
-            float steer = (float) (-this.currentSensors.getAngleToTrackAxis() / DrivingInstructor.steerLock);
+            float steer = (float) (-sensors.getAngleToTrackAxis() / DrivingInstructor.steerLock);
             int gear = -1; // gear R
 
             // If car is pointing in the correct direction revert gear and steer
-            if (this.currentSensors.getAngleToTrackAxis() * this.currentSensors.getTrackPosition() > 0) {
+            if (sensors.getAngleToTrackAxis() * sensors.getTrackPosition() > 0) {
                 gear = 1;
                 steer = -steer;
             }
 
-            this.clutch = (double) DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+            this.clutch = (double) DrivingInstructor.clutching(sensors, (float) this.clutch, getStage());
 
             // Build a CarControl variable and return it
             Action action = new Action();
@@ -166,10 +168,10 @@ public class SpeedTrainer extends Controller {
         Action action = new Action();
 
         // Calculate gear value ................ .......................................................................
-        action.gear = DrivingInstructor.getGear(this.currentSensors);
+        action.gear = DrivingInstructor.getGear(sensors);
 
         // Calculate steer value .......................................................................................
-        float steer = DrivingInstructor.getSteer(this.currentSensors);
+        float steer = DrivingInstructor.getSteer(sensors);
 
         // normalize steering
         if (steer < -1)
@@ -179,10 +181,18 @@ public class SpeedTrainer extends Controller {
         action.steering = steer;
 
         // Calculate accel/brake .......................................................................................
-        if (this.tics % 20 == 0) {
+        if (this.tics % 5 == 0) {
+            this.accel = this.currentSensors.getSpeed() - this.previousSensors.getSpeed();
+            this.previousSensors = this.currentSensors;
+            this.currentSensors = sensors;
             this.previousAccelState = this.currentAccelState;
             this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
-            this.accelReward = AccelControl.calculateReward(this.previousSensors, this.currentSensors);
+            this.accelReward = AccelControl.calculateReward(
+                    this.previousSensors,
+                    this.currentSensors,
+                    this.accel,
+                    (this.currentSensors.getSpeed() - this.previousSensors.getSpeed())
+            );
             this.actionAccel = (AccelControl.Actions) this.accelControlSystem.Update(
                     this.previousAccelState,
                     this.currentAccelState,
@@ -192,6 +202,10 @@ public class SpeedTrainer extends Controller {
             this.accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
             action.accelerate = this.accel_and_brake[0];
             action.brake = this.accel_and_brake[1];
+        } else {
+            action.accelerate = this.accel_and_brake[0];
+            action.brake = this.accel_and_brake[1];
+        }
 
 //            System.out.println("State P: " + this.previousAccelState.name());
 //            System.out.println("State C: " + this.currentAccelState.name());
@@ -200,17 +214,9 @@ public class SpeedTrainer extends Controller {
 //            System.out.println("Action: " + this.actionAccel);
 //            System.out.println();
 
-        } else {
-            this.previousAccelState = this.currentAccelState;
-            this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
-            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
-            this.accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
-            action.accelerate = this.accel_and_brake[0];
-            action.brake = this.accel_and_brake[1];
-        }
 
         // Calculate clutch ............................................................................................
-        this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+        this.clutch = DrivingInstructor.clutching(sensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
 
         return action;
