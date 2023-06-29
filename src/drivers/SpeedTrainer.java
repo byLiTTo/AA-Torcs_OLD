@@ -6,15 +6,19 @@ import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
+/**
+ * A driver implementation for training the speed control using Q-learning.
+ */
 public class SpeedTrainer extends Controller {
-    // QLearning to Steer Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // QLearning to Steer Control Variables
     private QLearning accelControlSystem;
     private AccelControl.States previousAccelState;
     private AccelControl.States currentAccelState;
     private AccelControl.Actions actionAccel;
     private double accelReward;
     private Double[] accel_and_brake;
-    // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Time, Laps and Statistics Variables
     private int tics;
     private int epochs;
     private int laps;
@@ -25,19 +29,20 @@ public class SpeedTrainer extends Controller {
     private double highSpeed;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
-    // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Cache variables
     private int stuck;
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
     private boolean timeOut;
-    private double accel;
+    private double previousAccel;
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Initializes the SpeedTrainer controller.
+     */
     public SpeedTrainer() {
-        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM,
-                Constants.RANGE_EPOCHS
-        );
+        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
         previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
         actionAccel = AccelControl.Actions.FULL_THROTTLE;
@@ -56,10 +61,16 @@ public class SpeedTrainer extends Controller {
         completeLap = false;
         offTrack = false;
         timeOut = false;
-        accel = 0.0;
+        previousAccel = 0.0;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * The main control method that is called at each time step.
+     *
+     * @param sensors The sensor data received from the simulator.
+     *
+     * @return The action to be performed by the car.
+     */
     @Override
     public Action control(SensorModel sensors) {
         if (this.tics == 0) {
@@ -75,7 +86,6 @@ public class SpeedTrainer extends Controller {
         } else {
             this.previosDistanceFromStartLine = this.currentDistanceFromStartLine;
             this.currentDistanceFromStartLine = sensors.getDistanceFromStartLine();
-
 
             this.tics++;
 
@@ -167,7 +177,7 @@ public class SpeedTrainer extends Controller {
         // If the car is not stuck .....................................................................................
         Action action = new Action();
 
-        // Calculate gear value ................ .......................................................................
+        // Calculate gear value .......................................................................................
         action.gear = DrivingInstructor.getGear(sensors);
 
         // Calculate steer value .......................................................................................
@@ -182,7 +192,7 @@ public class SpeedTrainer extends Controller {
 
         // Calculate accel/brake .......................................................................................
         if (this.tics % 5 == 0) {
-            this.accel = this.currentSensors.getSpeed() - this.previousSensors.getSpeed();
+            this.previousAccel = this.currentSensors.getSpeed() - this.previousSensors.getSpeed();
             this.previousSensors = this.currentSensors;
             this.currentSensors = sensors;
             this.previousAccelState = this.currentAccelState;
@@ -190,10 +200,10 @@ public class SpeedTrainer extends Controller {
             this.accelReward = AccelControl.calculateReward(
                     this.previousSensors,
                     this.currentSensors,
-                    this.accel,
+                    this.previousAccel,
                     (this.currentSensors.getSpeed() - this.previousSensors.getSpeed())
             );
-            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.Update(
+            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.update(
                     this.previousAccelState,
                     this.currentAccelState,
                     this.actionAccel,
@@ -207,14 +217,6 @@ public class SpeedTrainer extends Controller {
             action.brake = this.accel_and_brake[1];
         }
 
-//            System.out.println("State P: " + this.previousAccelState.name());
-//            System.out.println("State C: " + this.currentAccelState.name());
-//            System.out.println("Vel P: " + this.previousSensors.getSpeed());
-//            System.out.println("Vel C: " + this.currentSensors.getSpeed());
-//            System.out.println("Action: " + this.actionAccel);
-//            System.out.println();
-
-
         // Calculate clutch ............................................................................................
         this.clutch = DrivingInstructor.clutching(sensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
@@ -222,7 +224,9 @@ public class SpeedTrainer extends Controller {
         return action;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Resets the controller to its initial state.
+     */
     @Override
     public void reset() {
         previousAccelState = AccelControl.States.STRAIGHT_LINE;
@@ -263,7 +267,9 @@ public class SpeedTrainer extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Shuts down the controller.
+     */
     @Override
     public void shutdown() {
         System.out.println();
@@ -271,7 +277,11 @@ public class SpeedTrainer extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Generates statistics about the race.
+     *
+     * @return The statistics as a string.
+     */
     private String generateStatistics() {
         return getTrackName() + SEPARATOR
                 + this.epochs + SEPARATOR

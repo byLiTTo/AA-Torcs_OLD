@@ -1,6 +1,3 @@
-/**
- *
- */
 package torcs;
 
 import torcs.Controller.Stage;
@@ -8,7 +5,13 @@ import torcs.Controller.Stage;
 import java.util.StringTokenizer;
 
 /**
- * @author Daniele Loiacono
+ * The Client class is responsible for connecting to the TORCS server, receiving game state information,
+ * and controlling the car based on the provided controller implementation.
+ * <p> </p>
+ * <p>Created by IntelliJ IDEA.</p>
+ * <p>User: Daniele Loiacono</p>
+ * <p>Date: N/A</p>
+ * <p>Time: N/A</p>
  */
 public class Client {
 
@@ -23,15 +26,9 @@ public class Client {
     private static String trackName;
 
     /**
-     * @param args is used to define all the options of the client.
-     *             <port:N> is used to specify the port for the connection (default is 3001)
-     *             <host:ADDRESS> is used to specify the address of the host where the server is running (default is localhost)
-     *             <id:ClientID> is used to specify the ID of the client sent to the server (default is championship2009)
-     *             <verbose:on> is used to set verbose mode on (default is off)
-     *             <maxEpisodes:N> is used to set the number of episodes (default is 1)
-     *             <maxSteps:N> is used to set the max number of steps for each episode (0 is default value, that means unlimited number of steps)
-     *             <stage:N> is used to set the current stage: 0 is WARMUP, 1 is QUALIFYING, 2 is RACE, others value means UNKNOWN (default is UNKNOWN)
-     *             <trackName:name> is used to set the name of current track
+     * The main entry point of the client.
+     *
+     * @param args The command-line arguments.
      */
     public static void main(String[] args) {
         parseParameters(args);
@@ -96,8 +93,7 @@ public class Client {
 
                     Action action = new Action();
                     if (currStep < maxSteps || maxSteps == 0)
-                        action = driver.control(new MessageBasedSensorModel(
-                                inMsg));
+                        action = driver.control(new MessageBasedSensorModel(inMsg));
                     else
                         action.restartRace = true;
 
@@ -119,6 +115,11 @@ public class Client {
 
     }
 
+    /**
+     * Parses the command-line parameters and sets the corresponding values.
+     *
+     * @param args The command-line arguments.
+     */
     private static void parseParameters(String[] args) {
         /*
          * Set default values for the options
@@ -132,7 +133,9 @@ public class Client {
         stage = Stage.UNKNOWN;
         trackName = "unknown";
 
-        for (int i = 1; i < args.length; i++) {
+        for (int i = 1; i
+
+                < args.length; i++) {
             StringTokenizer st = new StringTokenizer(args[i], ":");
             String entity = st.nextToken();
             String value = st.nextToken();
@@ -151,8 +154,7 @@ public class Client {
                 else if (value.equals(false))
                     verbose = false;
                 else {
-                    System.out.println(entity + ":" + value
-                            + " is not a valid option");
+                    System.out.println(entity + ":" + value + " is not a valid option");
                     System.exit(0);
                 }
             }
@@ -168,22 +170,27 @@ public class Client {
             if (entity.equals("maxEpisodes")) {
                 maxEpisodes = Integer.parseInt(value);
                 if (maxEpisodes <= 0) {
-                    System.out.println(entity + ":" + value
-                            + " is not a valid option");
+                    System.out.println(entity + ":" + value + " is not a valid option");
                     System.exit(0);
                 }
             }
             if (entity.equals("maxSteps")) {
                 maxSteps = Integer.parseInt(value);
                 if (maxSteps < 0) {
-                    System.out.println(entity + ":" + value
-                            + " is not a valid option");
+                    System.out.println(entity + ":" + value + " is not a valid option");
                     System.exit(0);
                 }
             }
         }
     }
 
+    /**
+     * Loads an instance of the specified controller class.
+     *
+     * @param name The name of the controller class.
+     *
+     * @return The loaded controller instance.
+     */
     private static Controller load(String name) {
         Controller controller = null;
         try {

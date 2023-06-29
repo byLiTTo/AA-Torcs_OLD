@@ -1,3 +1,6 @@
+/**
+ * This class represents a direction-based driver that uses Q-learning to control the steering of the car.
+ */
 package drivers;
 
 import mdp.QLearning;
@@ -6,15 +9,18 @@ import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
+/**
+ * The DirectionDriver class extends the Controller class and implements the necessary methods to control the car's
+ * steering, gear, acceleration, and braking based on the Q-learning algorithm for steering control.
+ */
 public class DirectionDriver extends Controller {
 
-    // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // QLearning to Steer Control Variables
     private QLearning steerControlSystem;
-    private SteerControl.States previousSteerState;
     private SteerControl.States currentSteerState;
     private SteerControl.Actions actionSteer;
-    private double steerReward;
-    // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Time, Laps and Statistics Variables
     private int tics;
     private int epochs;
     private int laps;
@@ -24,19 +30,20 @@ public class DirectionDriver extends Controller {
     private double distanceRaced;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
-    // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Cache variables
     private int stuck;
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Constructs an instance of the DirectionDriver class.
+     */
     public DirectionDriver() {
         steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
 
         tics = 0;
         epochs = 0;
@@ -50,7 +57,13 @@ public class DirectionDriver extends Controller {
         offTrack = false;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Controls the car's actions based on the current sensor inputs.
+     *
+     * @param sensors the sensor data received from the car
+     *
+     * @return an Action object specifying the car's actions
+     */
     @Override
     public Action control(SensorModel sensors) {
         if (this.tics == 0) {
@@ -70,6 +83,7 @@ public class DirectionDriver extends Controller {
 
             this.tics++;
 
+            System.out.println("Tics: " + this.tics);
             System.out.println("Laps: " + this.laps + "/1");
             System.out.println("Epochs: " + this.epochs + "/" + Constants.MAX_EPOCHS);
             System.out.println("Complete Laps: " + this.completeLaps + "/" + Constants.MAX_EPOCHS);
@@ -91,6 +105,8 @@ public class DirectionDriver extends Controller {
                 Action action = new Action();
                 action.restartRace = true;
                 return action;
+
+
             }
         }
 
@@ -137,13 +153,13 @@ public class DirectionDriver extends Controller {
             return action;
         }
 
-        // If the car is not stuck .....................................................................................
+        // If the car is not stuck
         Action action = new Action();
 
-        // Calculate gear value ........................................................................................
+        // Calculate gear value
         action.gear = DrivingInstructor.getGear(this.currentSensors);
 
-        // Calculate steer value .......................................................................................
+        // Calculate steer value
         this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
         this.actionSteer = (SteerControl.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
         double steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
@@ -155,7 +171,7 @@ public class DirectionDriver extends Controller {
             steer = 1;
         action.steering = steer;
 
-        // Calculate accel/brake .......................................................................................
+        // Calculate accel/brake
         float accel_and_brake = DrivingInstructor.getAccel(this.currentSensors);
 
         // Set accel and brake from the joint accel/brake command
@@ -171,27 +187,29 @@ public class DirectionDriver extends Controller {
         action.accelerate = accel;
         action.brake = brake;
 
-        // Calculate clutch ............................................................................................
+        // Calculate clutch
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
 
         return action;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Resets the state of the driver.
+     */
     @Override
     public void reset() {
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
 
         if (this.completeLap) {
             this.completeLaps++;
             System.out.println("Complete lap!");
         }
         if (this.offTrack) {
-            System.out.println("Out of track!");
+            System
+
+                    .out.println("Out of track!");
         }
 
         String newResults = this.generateStatistics();
@@ -213,7 +231,9 @@ public class DirectionDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Shuts down the driver.
+     */
     @Override
     public void shutdown() {
         System.out.println();
@@ -221,7 +241,11 @@ public class DirectionDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Generates statistics about the race.
+     *
+     * @return a string containing the race statistics
+     */
     private String generateStatistics() {
         return getTrackName() + SEPARATOR
                 + this.epochs + SEPARATOR

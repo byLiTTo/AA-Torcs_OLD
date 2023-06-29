@@ -6,14 +6,15 @@ import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
+/**
+ * The GearDriver class is a TORCS driver that uses Q-learning to control the gear shifting of the car.
+ */
 public class GearDriver extends Controller {
-    // QLearning to Gear Control Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // QLearning to Gear Control Variables
     private QLearning gearControlSystem;
-    private GearControl.States previousGearState;
     private GearControl.States currentGearState;
     private GearControl.Actions actionGear;
-    private double gearReward;
-    // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // Time, Laps and Statistics Variables
     private int tics;
     private int epochs;
     private int laps;
@@ -23,19 +24,19 @@ public class GearDriver extends Controller {
     private double distanceRaced;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
-    // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // Cache variables
     private int stuck;
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Initializes a new instance of the GearDriver class.
+     */
     public GearDriver() {
         gearControlSystem = new QLearning(Constants.ControlSystems.GEAR_CONTROL_SYSTEM);
-        previousGearState = GearControl.States.NEUTRAL_REVERSE;
         currentGearState = GearControl.States.NEUTRAL_REVERSE;
         actionGear = GearControl.Actions.ACTIVE_LIMITER;
-        gearReward = 0;
 
         tics = 0;
         epochs = 0;
@@ -49,7 +50,13 @@ public class GearDriver extends Controller {
         offTrack = false;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Controls the car's actions based on the sensor inputs.
+     *
+     * @param sensors the sensor data received from the car
+     *
+     * @return an Action object representing the car's actions
+     */
     @Override
     public Action control(SensorModel sensors) {
         if (this.tics == 0) {
@@ -69,6 +76,7 @@ public class GearDriver extends Controller {
 
             this.tics++;
 
+            System.out.println("Tics: " + this.tics);
             System.out.println("Laps: " + this.laps + "/1");
             System.out.println("Epochs: " + this.epochs + "/" + Constants.MAX_EPOCHS);
             System.out.println("Complete Laps: " + this.completeLaps + "/" + Constants.MAX_EPOCHS);
@@ -136,25 +144,25 @@ public class GearDriver extends Controller {
             return action;
         }
 
-        // If the car is not stuck .....................................................................................
+        // If the car is not stuck
         Action action = new Action();
 
-        // Calculate gear value ................ .......................................................................
+        // Calculate gear value
         this.currentGearState = GearControl.evaluateGearState(this.currentSensors);
         this.actionGear = (GearControl.Actions) this.gearControlSystem.nextOnlyBestAction(this.currentGearState);
         action.gear = GearControl.gearAction2Double(this.currentSensors, this.actionGear);
 
-        // Calculate steer value .......................................................................................
+        // Calculate steer value
         float steer = DrivingInstructor.getSteer(this.currentSensors);
 
-        // normalize steering
+        // Normalize steering
         if (steer < -1)
             steer = -1;
         if (steer > 1)
             steer = 1;
         action.steering = steer;
 
-        // Calculate accel/brake .......................................................................................
+        // Calculate accel/brake
         float accel_and_brake = DrivingInstructor.getAccel(this.currentSensors);
 
         // Set accel and brake from the joint accel/brake command
@@ -170,20 +178,20 @@ public class GearDriver extends Controller {
         action.accelerate = accel;
         action.brake = brake;
 
-        // Calculate clutch ............................................................................................
+        // Calculate clutch
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
 
         return action;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Resets the driver's state and variables.
+     */
     @Override
     public void reset() {
-        previousGearState = GearControl.States.NEUTRAL_REVERSE;
         currentGearState = GearControl.States.NEUTRAL_REVERSE;
         actionGear = GearControl.Actions.ACTIVE_LIMITER;
-        gearReward = 0;
 
         if (this.completeLap) {
             this.completeLaps++;
@@ -212,7 +220,9 @@ public class GearDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Performs the necessary actions when the driver is shutting down.
+     */
     @Override
     public void shutdown() {
         System.out.println();
@@ -220,7 +230,11 @@ public class GearDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Generates a string containing the driver's statistics.
+     *
+     * @return a string representing the statistics
+     */
     private String generateStatistics() {
         return getTrackName() + SEPARATOR
                 + this.epochs + SEPARATOR

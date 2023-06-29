@@ -1,5 +1,6 @@
 package drivers;
 
+import mdp.AccelControl;
 import mdp.QLearning;
 import mdp.SteerControl;
 import torcs.*;
@@ -7,15 +8,25 @@ import torcs.*;
 import static torcs.Constants.SEPARATOR;
 
 /**
- * A driver that uses Q-learning to control the steering direction of the car.
+ * This controller uses automatic transmission to control the car's steering and acceleration.
  */
-public class DirectionTrainer extends Controller {
+public class AutomaticTransmissionTrainer extends Controller {
+
     // QLearning to Steer Control Variables
     private QLearning steerControlSystem;
     private SteerControl.States previousSteerState;
     private SteerControl.States currentSteerState;
     private SteerControl.Actions actionSteer;
     private double steerReward;
+
+    // QLearning to Acceleration Control Variables
+    private QLearning accelControlSystem;
+    private AccelControl.States previousAccelState;
+    private AccelControl.States currentAccelState;
+    private AccelControl.Actions actionAccel;
+    private double accelReward;
+    private Double[] accel_and_brake;
+
     // Time, Laps and Statistics Variables
     private int tics;
     private int epochs;
@@ -27,22 +38,31 @@ public class DirectionTrainer extends Controller {
     private double highSpeed;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
+
     // Cache variables
     private int stuck;
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
     private boolean timeOut;
+    private double previousAccel;
 
     /**
-     * Initializes a new instance of the DirectionTrainer class.
+     * Initializes the AutomaticTransmissionTrainer controller.
      */
-    public DirectionTrainer() {
+    public AutomaticTransmissionTrainer() {
         steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
         previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
         steerReward = 0;
+
+        accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM, Constants.RANGE_EPOCHS);
+        previousAccelState = AccelControl.States.STRAIGHT_LINE;
+        currentAccelState = AccelControl.States.STRAIGHT_LINE;
+        actionAccel = AccelControl.Actions.FULL_THROTTLE;
+        accelReward = 0;
+        accel_and_brake = new Double[2];
 
         tics = 0;
         epochs = 0;
@@ -56,14 +76,15 @@ public class DirectionTrainer extends Controller {
         completeLap = false;
         offTrack = false;
         timeOut = false;
+        previousAccel = 0.0;
     }
 
     /**
-     * Controls the car based on the current sensor inputs.
+     * Controls the car based on the sensor input.
      *
-     * @param sensors the sensor inputs received from the car
+     * @param sensors the sensor input received from the car
      *
-     * @return the action to be performed by the car
+     * @return the action to be taken by the car
      */
     @Override
     public Action control(SensorModel sensors) {
@@ -74,13 +95,12 @@ public class DirectionTrainer extends Controller {
             this.previousSensors = sensors;
             this.currentSensors = this.previousSensors;
 
+            accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
+
             this.tics++;
         } else {
             this.previosDistanceFromStartLine = this.currentDistanceFromStartLine;
             this.currentDistanceFromStartLine = sensors.getDistanceFromStartLine();
-
-            this.previousSensors = this.currentSensors;
-            this.currentSensors = sensors;
 
             this.tics++;
 
@@ -92,7 +112,7 @@ public class DirectionTrainer extends Controller {
         }
 
         // Check if time-out
-        if (this.currentSensors.getLastLapTime() > 240.0) {
+        if (sensors.getCurrentLapTime() > 240.0) {
             this.timeOut = true;
 
             Action action = new Action();
@@ -101,13 +121,11 @@ public class DirectionTrainer extends Controller {
         }
 
         // Update raced distance
-        this.distanceRaced = this.currentSensors.getDistanceRaced();
+        this.distanceRaced = sensors.getDistanceRaced();
 
         // Update high speed
-        if (this.currentSensors.getSpeed() > this.highSpeed
-
-        ) {
-            this.highSpeed = this.currentSensors.getSpeed();
+        if (sensors.getSpeed() > this.highSpeed) {
+            this.highSpeed = sensors.getSpeed();
         }
 
         // Update complete laps
@@ -115,7 +133,7 @@ public class DirectionTrainer extends Controller {
             this.laps++;
 
             // Car start back the goal, so ignore first update
-            // If the car complete the number of laps, restart the race
+            // If the car completes the number of laps, restart the race
             if (this.laps >= 1) {
                 this.completeLap = true;
 
@@ -126,36 +144,38 @@ public class DirectionTrainer extends Controller {
         }
 
         // If the car is off track, restart the race
-        if (Math.abs(this.currentSensors.getTrackPosition()) >= 1) {
+        if (Math.abs(sensors.getTrackPosition()) >= 1) {
             this.offTrack = true;
+
+            this.accelControlSystem.lastUpdate(this.actionAccel, -1000.0);
 
             Action action = new Action();
             action.restartRace = true;
             return action;
         }
 
-        // check if car is currently stuck
-        if (Math.abs(this.currentSensors.getAngleToTrackAxis()) > DrivingInstructor.stuckAngle) {
+        // Check if the car is currently stuck
+        if (Math.abs(sensors.getAngleToTrackAxis()) > DrivingInstructor.stuckAngle) {
             this.stuck++;
         } else {
             this.stuck = 0;
         }
 
-        // After car is stuck for a while apply recovering policy
+        // After the car is stuck for a while, apply recovering policy
         if (this.stuck > DrivingInstructor.stuckTime) {
-            // Set gear and steering command assuming car is pointing in a direction out of track
+            // Set gear and steering command assuming car is pointing in a direction out of the track
 
-            // To bring car parallel to track axis
-            float steer = (float) (-this.currentSensors.getAngleToTrackAxis() / DrivingInstructor.steerLock);
+            // To bring the car parallel to the track axis
+            float steer = (float) (-sensors.getAngleToTrackAxis() / DrivingInstructor.steerLock);
             int gear = -1; // gear R
 
-            // If car is pointing in the correct direction revert gear and steer
-            if (this.currentSensors.getAngleToTrackAxis() * this.currentSensors.getTrackPosition() > 0) {
+            // If the car is pointing in the correct direction, revert gear and steer
+            if (sensors.getAngleToTrackAxis() * sensors.getTrackPosition() > 0) {
                 gear = 1;
                 steer = -steer;
             }
 
-            this.clutch = (double) DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+            this.clutch = (double) DrivingInstructor.clutching(sensors, (float) this.clutch, getStage());
 
             // Build a CarControl variable and return it
             Action action = new Action();
@@ -168,20 +188,20 @@ public class DirectionTrainer extends Controller {
             return action;
         }
 
-
         // If the car is not stuck
         Action action = new Action();
 
         // Calculate gear value
-        action.gear = DrivingInstructor.getGear(this.currentSensors);
+        action.gear = DrivingInstructor.getGear(sensors);
 
         // Calculate steer value
         double steer;
-
         if (this.tics % 5 == 0) {
             this.previousSteerState = this.currentSteerState;
             this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
-            this.steerReward = SteerControl.calculateReward(this.previousSensors, this.currentSensors);
+            this.steerReward
+
+                    = SteerControl.calculateReward(this.previousSensors, this.currentSensors);
             this.actionSteer = (SteerControl.Actions) this.steerControlSystem.update(
                     this.previousSteerState,
                     this.currentSteerState,
@@ -193,38 +213,49 @@ public class DirectionTrainer extends Controller {
             steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
         }
 
-        // normalize steering
-        if (steer < -1) steer = -1;
-        if (steer > 1) steer = 1;
+        // Normalize steering
+        if (steer < -1)
+            steer = -1;
+        if (steer > 1)
+            steer = 1;
         action.steering = steer;
 
         // Calculate accel/brake
-        float accel_and_brake = DrivingInstructor.getAccel(this.currentSensors);
-
-        // Set accel and brake from the joint accel/brake command
-        float accel
-
-                , brake;
-        if (accel_and_brake > 0) {
-            accel = accel_and_brake;
-            brake = 0;
+        if (this.tics % 5 == 0) {
+            this.previousAccel = this.currentSensors.getSpeed() - this.previousSensors.getSpeed();
+            this.previousSensors = this.currentSensors;
+            this.currentSensors = sensors;
+            this.previousAccelState = this.currentAccelState;
+            this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
+            this.accelReward = AccelControl.calculateReward(
+                    this.previousSensors,
+                    this.currentSensors,
+                    this.previousAccel,
+                    (this.currentSensors.getSpeed() - this.previousSensors.getSpeed())
+            );
+            this.actionAccel = (AccelControl.Actions) this.accelControlSystem.update(
+                    this.previousAccelState,
+                    this.currentAccelState,
+                    this.actionAccel,
+                    this.accelReward
+            );
+            this.accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
+            action.accelerate = this.accel_and_brake[0];
+            action.brake = this.accel_and_brake[1];
         } else {
-            accel = 0;
-            // apply ABS to brake
-            brake = DrivingInstructor.filterABS(this.currentSensors, -accel_and_brake);
+            action.accelerate = this.accel_and_brake[0];
+            action.brake = this.accel_and_brake[1];
         }
-        action.accelerate = accel;
-        action.brake = brake;
 
         // Calculate clutch
-        this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
+        this.clutch = DrivingInstructor.clutching(sensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
 
         return action;
     }
 
     /**
-     * Resets the state of the driver.
+     * Resets the controller.
      */
     @Override
     public void reset() {
@@ -232,6 +263,11 @@ public class DirectionTrainer extends Controller {
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
         steerReward = 0;
+
+        previousAccelState = AccelControl.States.STRAIGHT_LINE;
+        currentAccelState = AccelControl.States.STRAIGHT_LINE;
+        actionAccel = AccelControl.Actions.FULL_THROTTLE;
+        accelReward = 0;
 
         if (this.timeOut) {
             System.out.println("Time out!!!");
@@ -246,8 +282,11 @@ public class DirectionTrainer extends Controller {
         }
 
         String newResults = this.generateStatistics();
-        this.steerControlSystem.saveQTableAndStatistics(newResults);
+        this.steerControlSystem.saveTable();
         this.steerControlSystem.decreaseEpsilon();
+
+        this.accelControlSystem.saveQTableAndStatistics(newResults);
+        this.accelControlSystem.decreaseEpsilon();
 
         tics = 0;
         epochs++;
@@ -259,7 +298,9 @@ public class DirectionTrainer extends Controller {
         clutch = 0;
         completeLap = false;
         offTrack = false;
-        timeOut = false;
+        timeOut
+
+                = false;
 
         System.out.println();
         System.out.println("*** Restarting the race ***");
@@ -267,7 +308,7 @@ public class DirectionTrainer extends Controller {
     }
 
     /**
-     * Shuts down the driver.
+     * Shuts down the controller.
      */
     @Override
     public void shutdown() {
@@ -277,11 +318,17 @@ public class DirectionTrainer extends Controller {
     }
 
     /**
-     * Generates a string containing the statistics of the driver.
+     * Generates statistics about the controller's performance.
      *
-     * @return the generated statistics string
+     * @return the statistics as a string
      */
     private String generateStatistics() {
-        return getTrackName() + SEPARATOR + this.epochs + SEPARATOR + this.tics + SEPARATOR + (int) (this.distanceRaced) + SEPARATOR + (int) (this.highSpeed) + SEPARATOR + this.completeLaps + SEPARATOR + Constants.MAX_EPOCHS;
+        return getTrackName() + SEPARATOR
+                + this.epochs + SEPARATOR
+                + this.tics + SEPARATOR
+                + (int) (this.distanceRaced) + SEPARATOR
+                + (int) (this.highSpeed) + SEPARATOR
+                + this.completeLaps + SEPARATOR
+                + Constants.MAX_EPOCHS;
     }
 }

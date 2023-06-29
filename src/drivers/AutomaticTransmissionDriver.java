@@ -7,21 +7,22 @@ import torcs.*;
 
 import static torcs.Constants.SEPARATOR;
 
+/**
+ * An automatic transmission driver that uses Q-learning to control steering and acceleration.
+ */
 public class AutomaticTransmissionDriver extends Controller {
 
-    // QLearning to Steer Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    // QLearning to Steer Control Variables
     private QLearning steerControlSystem;
-    private SteerControl.States previousSteerState;
     private SteerControl.States currentSteerState;
     private SteerControl.Actions actionSteer;
-    private double steerReward;
-    // QLearning to Accel Control Variables  --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // QLearning to Accel Control Variables
     private QLearning accelControlSystem;
-    private AccelControl.States previousAccelState;
     private AccelControl.States currentAccelState;
     private AccelControl.Actions actionAccel;
-    private double accelReward;
-    // Time, Laps and Statistics Variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Time, Laps and Statistics Variables
     private int tics;
     private int epochs;
     private int laps;
@@ -31,24 +32,24 @@ public class AutomaticTransmissionDriver extends Controller {
     private double distanceRaced;
     private SensorModel previousSensors;
     private SensorModel currentSensors;
-    // Cache variables   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+
+    // Cache variables
     private int stuck;
     private double clutch;
     private boolean completeLap;
     private boolean offTrack;
 
+    /**
+     * Initializes a new instance of the AutomaticTransmissionDriver class.
+     */
     public AutomaticTransmissionDriver() {
         steerControlSystem = new QLearning(Constants.ControlSystems.STEERING_CONTROL_SYSTEM);
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
 
         accelControlSystem = new QLearning(Constants.ControlSystems.ACCELERATION_CONTROL_SYSTEM);
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
         actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
 
         tics = 0;
         epochs = 0;
@@ -62,7 +63,13 @@ public class AutomaticTransmissionDriver extends Controller {
         offTrack = false;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Controls the car based on the sensor inputs.
+     *
+     * @param sensors the sensor data received from the car
+     *
+     * @return the action to be performed by the car
+     */
     @Override
     public Action control(SensorModel sensors) {
         if (this.tics == 0) {
@@ -149,13 +156,13 @@ public class AutomaticTransmissionDriver extends Controller {
             return action;
         }
 
-        // If the car is not stuck .....................................................................................
+        // If the car is not stuck
         Action action = new Action();
 
-        // Calculate gear value ........................................................................................
+        // Calculate gear value
         action.gear = DrivingInstructor.getGear(this.currentSensors);
 
-        // Calculate steer value .......................................................................................
+        // Calculate steer value
         this.currentSteerState = SteerControl.evaluateSteerState(this.currentSensors);
         this.actionSteer = (SteerControl.Actions) this.steerControlSystem.nextOnlyBestAction(this.currentSteerState);
         double steer = SteerControl.steerAction2Double(this.currentSensors, this.actionSteer);
@@ -167,32 +174,30 @@ public class AutomaticTransmissionDriver extends Controller {
             steer = 1;
         action.steering = steer;
 
-        // Calculate accel/brake .......................................................................................
+        // Calculate accel/brake
         this.currentAccelState = AccelControl.evaluateAccelState(this.currentSensors);
         this.actionAccel = (AccelControl.Actions) this.accelControlSystem.nextOnlyBestAction(this.currentAccelState);
         Double[] accel_and_brake = AccelControl.accelAction2Double(this.currentSensors, this.actionAccel);
         action.accelerate = accel_and_brake[0];
         action.brake = accel_and_brake[1];
 
-        // Calculate clutch ............................................................................................
+        // Calculate clutch
         this.clutch = DrivingInstructor.clutching(this.currentSensors, (float) this.clutch, getStage());
         action.clutch = this.clutch;
 
         return action;
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Resets the controller's state.
+     */
     @Override
     public void reset() {
-        previousSteerState = SteerControl.States.NORMAL_SPEED;
         currentSteerState = SteerControl.States.NORMAL_SPEED;
         actionSteer = SteerControl.Actions.TURN_STEERING_WHEEL;
-        steerReward = 0;
 
-        previousAccelState = AccelControl.States.STRAIGHT_LINE;
         currentAccelState = AccelControl.States.STRAIGHT_LINE;
         actionAccel = AccelControl.Actions.FULL_THROTTLE;
-        accelReward = 0;
 
         if (this.completeLap) {
             this.completeLaps++;
@@ -221,7 +226,9 @@ public class AutomaticTransmissionDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Shuts down the controller.
+     */
     @Override
     public void shutdown() {
         System.out.println();
@@ -229,7 +236,11 @@ public class AutomaticTransmissionDriver extends Controller {
         System.out.println();
     }
 
-    //   --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> -->
+    /**
+     * Generates a string containing the statistics for the current race.
+     *
+     * @return the statistics string
+     */
     private String generateStatistics() {
         return getTrackName() + SEPARATOR
                 + this.epochs + SEPARATOR

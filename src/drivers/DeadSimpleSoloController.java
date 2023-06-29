@@ -1,21 +1,23 @@
 package drivers;
 
-
 import torcs.Action;
 import torcs.Controller;
 import torcs.SensorModel;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Administrator
- * Date: Mar 4, 2008
- * Time: 4:59:21 PM
+ * This is a simple solo controller that maintains a target speed and adjusts the steering to stay on the track.
  */
 public class DeadSimpleSoloController extends Controller {
 
-    final double targetSpeed = 55;
+    private final double targetSpeed = 55;
 
-
+    /**
+     * Controls the car based on the sensor input.
+     *
+     * @param sensorModel the sensor input received from the car
+     *
+     * @return the action to be taken by the car
+     */
     public Action control(SensorModel sensorModel) {
         Action action = new Action();
         if (sensorModel.getSpeed() < targetSpeed) {
@@ -30,11 +32,16 @@ public class DeadSimpleSoloController extends Controller {
         return action;
     }
 
+    /**
+     * Resets the state of the controller.
+     */
     public void reset() {
         System.out.println("Restarting the race!");
-
     }
 
+    /**
+     * Shuts down the controller.
+     */
     public void shutdown() {
         System.out.println("Bye bye!");
     }

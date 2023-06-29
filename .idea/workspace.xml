@@ -4,27 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4fa1b8f8-647d-448f-a7b9-d72a37a6f4f6" name="Changes" comment="calculateRewardV6">
-      <change afterPath="$PROJECT_DIR$/classes/mdp/resources/QTable_Accel.csv" afterDir="false" />
+    <list default="true" id="4fa1b8f8-647d-448f-a7b9-d72a37a6f4f6" name="Changes" comment="Terminado sistema de control de aceleración">
+      <change afterPath="$PROJECT_DIR$/src/drivers/AutomaticTransmissionTrainer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/drivers/ManualTransmissionTrainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_06_2023_17_10_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_06_2023_17_10__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_6_20_2023_02_14_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_6_20_2023_02_14_PM__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/AutomaticTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/AutomaticTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/DirectionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/DirectionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/GearDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/GearDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/ManualTransmissionDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/ManualTransmissionDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/SpeedDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/SpeedDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/drivers/SpeedTrainer.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/drivers/SpeedTrainer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl$Actions.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl$Actions.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl$States.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl$States.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/AccelControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/AccelControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/QLearning.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/QLearning.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTest.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" beforeDir="false" afterPath="$PROJECT_DIR$/classes/mdp/resources/StatisticsTrain.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/torcs/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/torcs/Constants.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/AutomaticTransmissionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/AutomaticTransmissionDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/DeadSimpleSoloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/DeadSimpleSoloController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/DirectionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/DirectionDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/DirectionTrainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/DirectionTrainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/GearDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/GearDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/GearTrainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/GearTrainer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/ManualTransmissionDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/ManualTransmissionDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/drivers/SimpleDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/SimpleDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/SpeedDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/SpeedDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/drivers/SpeedTrainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/drivers/SpeedTrainer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/AccelControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/AccelControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/GearControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/GearControl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/mdp/QLearning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/QLearning.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/SteerControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/mdp/SteerControl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/tmp/AccelControlVariables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/tmp/ClutchControlVariables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mdp/tmp/SteerControlVariables.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Action.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/torcs/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/DrivingInstructor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/DrivingInstructor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/MessageBasedSensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/MessageBasedSensorModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/MessageParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/MessageParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/SensorModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/SensorModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torcs/SocketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/torcs/SocketHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,23 +62,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/Users/carlos/WORKSPACE/AA-Torcs/classes/mdp/resources",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "terminal",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/carlos/WORKSPACE/AA-Torcs/classes/mdp/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/classes/mdp/resources" />
@@ -107,7 +121,8 @@
       <workItem from="1687541774313" duration="17000" />
       <workItem from="1687541798104" duration="3744000" />
       <workItem from="1687601302636" duration="29029000" />
-      <workItem from="1687685333410" duration="68778000" />
+      <workItem from="1687685333410" duration="75950000" />
+      <workItem from="1688059786867" duration="6518000" />
     </task>
     <task id="LOCAL-00003" summary="- Evaluacion de estado de dirección de volante&#10;- Ejecucion de accion de dirección de volante&#10;- Funcion recompensa (beta) de dirección de volante">
       <option name="closed" value="true" />
@@ -165,7 +180,15 @@
       <option name="project" value="LOCAL" />
       <updated>1687790969828</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Terminado sistema de control de aceleración">
+      <option name="closed" value="true" />
+      <created>1687797389474</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1687797389474</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,7 +226,8 @@
     <MESSAGE value="calculateRewardV4" />
     <MESSAGE value="calculateRewardV5" />
     <MESSAGE value="calculateRewardV6" />
-    <option name="LAST_COMMIT_MESSAGE" value="calculateRewardV6" />
+    <MESSAGE value="Terminado sistema de control de aceleración" />
+    <option name="LAST_COMMIT_MESSAGE" value="Terminado sistema de control de aceleración" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
